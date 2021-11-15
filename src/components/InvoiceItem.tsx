@@ -1,5 +1,14 @@
-import { Stack, Text, Box, useColorMode } from '@chakra-ui/react'
 import React from 'react'
+import { MdOutlineKeyboardArrowRight } from 'react-icons/md'
+import {
+  Grid,
+  GridItem,
+  useBreakpointValue,
+  Text,
+  Box,
+  useColorMode,
+  Icon
+} from '@chakra-ui/react'
 import { Invoice } from '../interfaces'
 import { format } from 'date-fns'
 import esLocale from 'date-fns/locale/es'
@@ -10,81 +19,104 @@ export function formatDateEs(date: string) {
 }
 export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
   const { colorMode } = useColorMode()
+  const hiddenArrowRight = useBreakpointValue({ base: true, md: false })
   return (
-    <Stack
+    <Grid
+      rowGap={{ base: 2, md: 0 }}
       boxShadow={'sm'}
       padding={6}
-      spacing={7}
-      borderRadius={'lg'}
       bg={colorMode === 'dark' ? 'bg_app.card' : 'white'}
+      borderRadius={'lg'}
+      templateColumns={{ base: 'repeat(4, 1fr)', md: 'repeat(15, 1fr)' }}
     >
-      <Stack justifyContent={'space-between'} direction={'row'}>
+      <GridItem
+        marginBottom={{ base: 4, md: 0 }}
+        justifySelf={'start'}
+        placeSelf={{ md: 'center' }}
+        colSpan={{ base: 2, md: 2 }}
+        rowSpan={{ base: 2, md: 1 }}
+      >
         <Text
+          fontSize={'sm'}
+          fontWeight={'bold'}
           color={colorMode === 'dark' ? 'white' : 'texto.bold'}
-          fontWeight={'extrabold'}
-          fontSize={'base'}
         >
           <Box as={'span'} color={'texto.light'} fontWeight={'bold'}>
             #
           </Box>
           {invoice.id}
         </Text>
-        <Text fontSize={'sm'}> {invoice.clientName} </Text>
-      </Stack>
-      <Stack
-        justifyContent={'space-between'}
-        alignItems={'center'}
-        direction={'row'}
-        height={'47'}
+      </GridItem>
+      <GridItem
+        justifySelf={{ base: 'end', md: 'start' }}
+        placeSelf={{ md: 'center' }}
+        colSpan={{ base: 2, md: 3 }}
+        colStart={{ base: 3, md: 6 }}
+        rowSpan={{ base: 2, md: 1 }}
       >
-        <Stack>
-          <Text fontSize={'sm'}>
-            <Box
-              as={'span'}
-              color={colorMode === 'dark' ? 'texto.dark' : 'texto.gray'}
-            >
-              Due
-            </Box>{' '}
-            {formatDateEs(invoice.paymentDue)}{' '}
-          </Text>
+        <Text fontSize={'sm'}> {invoice.clientName} </Text>
+      </GridItem>
+      <GridItem
+        alignSelf={{ base: 'end', md: 'start' }}
+        placeSelf={{ md: 'center' }}
+        colSpan={{ base: 2, md: 3 }}
+        colStart={{ base: 1, md: 3 }}
+        rowStart={{ md: 1 }}
+      >
+        <Text fontSize={'sm'}>
           <Box
-            fontWeight={'bold'}
-            color={colorMode === 'dark' ? 'white' : 'texto.bold'}
-            fontSize={'xl'}
+            as={'span'}
+            color={colorMode === 'dark' ? 'texto.dark' : 'texto.gray'}
           >
-            <Box as={'span'}>&euro;</Box> {invoice.total}{' '}
-          </Box>
-        </Stack>
-        <Stack
-          paddingY={1}
-          width={'104px'}
+            Due
+          </Box>{' '}
+          {formatDateEs(invoice.paymentDue)}
+        </Text>
+      </GridItem>
+      <GridItem
+        alignSelf={'start'}
+        placeSelf={{ md: 'center' }}
+        colStart={{ base: 1, md: 9 }}
+        colSpan={{ base: 2, md: 3 }}
+      >
+        <Text
+          fontSize={'md'}
+          color={colorMode === 'dark' ? 'white' : 'texto.bold'}
+          fontWeight={'bold'}
+        >
+          &euro; 1.800.90
+        </Text>
+      </GridItem>
+      <GridItem
+        alignSelf={'center'}
+        colStart={{ base: 3, md: 12 }}
+        rowSpan={{ base: 2, md: 1 }}
+        rowStart={{ base: 3, md: 1 }}
+        colSpan={{ base: 2, md: 3 }}
+      >
+        <Text
+          fontSize={'sm'}
+          fontWeight={'bold'}
           borderRadius={'lg'}
-          direction={'row'}
-          alignItems={'center'}
-          justifyContent={'center'}
+          color={'white'}
+          textAlign={'center'}
+          paddingY={2}
           bg={`status.${invoice.status}`}
         >
-          <Box color={`white`} as={'span'} fontSize={'x-large'}>
-            &bull;
-          </Box>
-          <Text color={`white`} fontSize={'base'} fontWeight={'bold'}>
-            {invoice.status.replace(
-              invoice.status[0],
-              invoice.status[0].toUpperCase()
-            )}
-          </Text>
-        </Stack>
-      </Stack>
-    </Stack>
+          {invoice.status.replace(
+            invoice.status[0],
+            invoice.status[0].toUpperCase()
+          )}
+        </Text>
+      </GridItem>
+      <GridItem hidden={hiddenArrowRight} placeSelf={'center'}>
+        <Icon
+          width={7}
+          height={7}
+          color={'primary.500'}
+          as={MdOutlineKeyboardArrowRight}
+        />
+      </GridItem>
+    </Grid>
   )
-}
-
-function getColor(status: 'paid' | 'pending' | 'draft' | string) {
-  if (status === 'paid') {
-    return 'green'
-  } else if (status === 'pending') {
-    return 'orange'
-  } else {
-    return 'gray'
-  }
 }
