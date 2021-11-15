@@ -5,10 +5,10 @@ import Router from './Routes.routes'
 const queryClient = new QueryClient()
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools />
-      <Router />
-    </QueryClientProvider>
+    // <QueryClientProvider client={queryClient}>
+    //   <ReactQueryDevtools />
+    // </QueryClientProvider>
+    <Router />
   )
 }
 
