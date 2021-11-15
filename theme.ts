@@ -18,10 +18,22 @@ const theme: Partial<ChakraTheme> = {
       100: '#9277FF',
       500: '#7C5DFA'
     },
+    purple: {
+      100: '#7C5DFA',
+      200: '#7C5DFA',
+      300: '#7C5DFA',
+      400: '#7C5DFA',
+      500: '#7C5DFA',
+      600: '#7C5DFA',
+      700: '#7C5DFA',
+      800: '#7C5DFA',
+      900: '#7C5DFA'
+    },
     bg_app: {
       light: '#F8F8FB',
       dark: '#141625',
-      card: '#1E2139'
+      card: '#1E2139',
+      gray: '#252945'
     },
     texto: {
       gray: '#888EB0',
@@ -33,10 +45,18 @@ const theme: Partial<ChakraTheme> = {
       100: '#FF9797',
       500: '#EC5757'
     },
-    status: {
-      paid: '#33D69F',
-      pending: '#FF8F00',
-      draft: '#373B53'
+
+    paid: {
+      100: 'rgba(51,214,159, 0.15)',
+      500: '#33D69F'
+    },
+    pending: {
+      100: 'rgba(255,143,0, 0.15)',
+      500: '#FF8F00'
+    },
+    draft: {
+      100: 'rgba(55,59,83, 0.15)',
+      500: '#373B53'
     }
   },
   fonts: {
@@ -52,6 +72,11 @@ const theme: Partial<ChakraTheme> = {
       baseStyle: (props) => ({
         color: mode('texto.bold', 'white')(props)
       })
+    },
+    Checkbox: {
+      // baseStyle: (props) => ({
+      //   bgColor: mode('primary.500', 'primary.500')(props)
+      // })
     }
   }
 }

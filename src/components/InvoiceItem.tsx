@@ -1,5 +1,6 @@
 import React from 'react'
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md'
+import { BsDot } from 'react-icons/bs'
 import {
   Grid,
   GridItem,
@@ -7,7 +8,8 @@ import {
   Text,
   Box,
   useColorMode,
-  Icon
+  Icon,
+  Stack
 } from '@chakra-ui/react'
 import { Invoice } from '../interfaces'
 import { format } from 'date-fns'
@@ -24,7 +26,8 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
     <Grid
       rowGap={{ base: 2, md: 0 }}
       boxShadow={'sm'}
-      padding={6}
+      paddingY={4}
+      paddingX={2}
       bg={colorMode === 'dark' ? 'bg_app.card' : 'white'}
       borderRadius={'lg'}
       templateColumns={{ base: 'repeat(4, 1fr)', md: 'repeat(15, 1fr)' }}
@@ -37,7 +40,7 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
         rowSpan={{ base: 2, md: 1 }}
       >
         <Text
-          fontSize={'sm'}
+          fontSize={'xs'}
           fontWeight={'bold'}
           color={colorMode === 'dark' ? 'white' : 'texto.bold'}
         >
@@ -54,7 +57,7 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
         colStart={{ base: 3, md: 6 }}
         rowSpan={{ base: 2, md: 1 }}
       >
-        <Text fontSize={'sm'}> {invoice.clientName} </Text>
+        <Text fontSize={'xs'}> {invoice.clientName} </Text>
       </GridItem>
       <GridItem
         alignSelf={{ base: 'end', md: 'start' }}
@@ -63,7 +66,7 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
         colStart={{ base: 1, md: 3 }}
         rowStart={{ md: 1 }}
       >
-        <Text fontSize={'sm'}>
+        <Text fontSize={'xs'}>
           <Box
             as={'span'}
             color={colorMode === 'dark' ? 'texto.dark' : 'texto.gray'}
@@ -80,7 +83,7 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
         colSpan={{ base: 2, md: 3 }}
       >
         <Text
-          fontSize={'md'}
+          fontSize={'sm'}
           color={colorMode === 'dark' ? 'white' : 'texto.bold'}
           fontWeight={'bold'}
         >
@@ -89,25 +92,52 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
       </GridItem>
       <GridItem
         alignSelf={'center'}
+        marginLeft={5}
         colStart={{ base: 3, md: 12 }}
         rowSpan={{ base: 2, md: 1 }}
         rowStart={{ base: 3, md: 1 }}
         colSpan={{ base: 2, md: 3 }}
+        bg={`${invoice.status}.100`}
+        borderRadius={'lg'}
       >
-        <Text
-          fontSize={'sm'}
-          fontWeight={'bold'}
-          borderRadius={'lg'}
-          color={'white'}
-          textAlign={'center'}
-          paddingY={2}
-          bg={`status.${invoice.status}`}
+        <Stack
+          direction={'row'}
+          spacing={0}
+          justifyContent={'center'}
+          alignItems={'center'}
         >
-          {invoice.status.replace(
-            invoice.status[0],
-            invoice.status[0].toUpperCase()
-          )}
-        </Text>
+          <Icon
+            width={9}
+            height={9}
+            color={`${
+              invoice.status === 'draft'
+                ? colorMode === 'dark'
+                  ? 'texto.dark'
+                  : 'texto.bold'
+                : `${invoice.status}.500`
+            }`}
+            as={BsDot}
+          />
+          <Text
+            fontSize={'xs'}
+            fontWeight={'bold'}
+            color={`${
+              invoice.status === 'draft'
+                ? colorMode === 'dark'
+                  ? 'texto.dark'
+                  : 'texto.bold'
+                : `${invoice.status}.500`
+            }`}
+            textAlign={'center'}
+            paddingY={3}
+            paddingRight={3}
+          >
+            {invoice.status.replace(
+              invoice.status[0],
+              invoice.status[0].toUpperCase()
+            )}
+          </Text>
+        </Stack>
       </GridItem>
       <GridItem hidden={hiddenArrowRight} placeSelf={'center'}>
         <Icon
