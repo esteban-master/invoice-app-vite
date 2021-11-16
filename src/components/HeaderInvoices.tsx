@@ -1,6 +1,5 @@
 import React from 'react'
 import { Heading, Stack, Text, useBreakpointValue } from '@chakra-ui/react'
-
 import { Invoice } from '../interfaces'
 import { FilterByStatus } from './FilterByStatus'
 
@@ -16,10 +15,13 @@ export const HeaderInvoices = ({ data }: { data: Invoice[] }) => {
       <Stack spacing={0}>
         <Heading fontSize={'3xl'}>Invoices</Heading>
         <Text fontSize={'xs'}>
-          {' '}
           {hidden
-            ? `${data.length} invoices`
-            : `There are ${data.length} total invoices`}{' '}
+            ? data.length > 0
+              ? `${data.length} invoices`
+              : 'No invoices'
+            : data.length > 0
+            ? `There are ${data.length} total invoices`
+            : 'No invoices'}
         </Text>
       </Stack>
 
@@ -27,21 +29,3 @@ export const HeaderInvoices = ({ data }: { data: Invoice[] }) => {
     </Stack>
   )
 }
-
-// function CustomIcon(props: CheckboxProps) {
-//   const { isIndeterminate, isChecked, ...rest } = props
-//   // console.log(isChecked, isIndeterminate)
-//   if (!isChecked) return null
-
-//   return (
-//     <Box as={'span'} {...rest}>
-//       <Icon
-//         width={'100%'}
-//         height={'100%'}
-//         bg={'primary.500'}
-//         color={'white'}
-//         as={BsCheck}
-//       />
-//     </Box>
-//   )
-// }

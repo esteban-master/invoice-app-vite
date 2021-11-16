@@ -18,17 +18,6 @@ const theme: Partial<ChakraTheme> = {
       100: '#9277FF',
       500: '#7C5DFA'
     },
-    purple: {
-      100: '#7C5DFA',
-      200: '#7C5DFA',
-      300: '#7C5DFA',
-      400: '#7C5DFA',
-      500: '#7C5DFA',
-      600: '#7C5DFA',
-      700: '#7C5DFA',
-      800: '#7C5DFA',
-      900: '#7C5DFA'
-    },
     bg_app: {
       light: '#F8F8FB',
       dark: '#141625',
@@ -65,18 +54,24 @@ const theme: Partial<ChakraTheme> = {
   components: {
     Text: {
       baseStyle: (props) => ({
-        color: mode('texto.light', 'texto.dark')(props)
-      })
+        color: mode('texto.light', 'texto.dark')(props),
+        fontSize: 'xs'
+      }),
+      variants: {
+        bold: (props) => ({
+          fontWeight: 'bold',
+          color: mode('texto.bold', 'white')(props)
+        }),
+        price: (props) => ({
+          fontWeight: 'bold',
+          color: mode('texto.light', 'texto.gray')(props)
+        })
+      }
     },
     Heading: {
       baseStyle: (props) => ({
         color: mode('texto.bold', 'white')(props)
       })
-    },
-    Checkbox: {
-      // baseStyle: (props) => ({
-      //   bgColor: mode('primary.500', 'primary.500')(props)
-      // })
     }
   }
 }

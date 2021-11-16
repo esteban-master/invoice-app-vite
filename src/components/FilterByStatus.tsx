@@ -22,7 +22,7 @@ export const FilterByStatus = ({ status }: { status: string[] }) => {
     <Stack spacing={6} direction={'row'} alignItems={'center'}>
       <Menu>
         <MenuButton>
-          <Stack direction={'row'} alignItems={'center'}>
+          <Stack fontWeight={'bold'} direction={'row'} alignItems={'center'}>
             <Box>{hidden ? 'Filter' : 'Filter by status'} </Box>
             <Icon
               width={5}
@@ -33,15 +33,15 @@ export const FilterByStatus = ({ status }: { status: string[] }) => {
           </Stack>
         </MenuButton>
         <MenuList
-          marginTop={4}
+          marginTop={3}
           bg={colorMode === 'dark' ? 'bg_app.gray' : 'white'}
         >
           {status.map((s) => (
-            <MenuItem cursor={'pointer'} as="label" htmlFor={s}>
+            <MenuItem key={s} cursor={'pointer'} as="label" htmlFor={s}>
               <Stack direction={'row'} alignItems={'center'}>
                 <Checkbox
                   id={s}
-                  colorScheme={'purple'}
+                  colorScheme={'primary'}
                   iconColor="white"
                   _hover={{
                     borderColor: 'primary.500'
