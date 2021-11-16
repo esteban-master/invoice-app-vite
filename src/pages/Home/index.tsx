@@ -4,10 +4,11 @@ import data from '../../../data.json'
 import { HeaderInvoices } from '../../components/HeaderInvoices'
 import { InvoiceItem } from '../../components/InvoiceItem'
 import empty from '/illustration-empty.svg'
+import { Layout } from '../../components/Layout'
 
 export const Home = () => {
   return (
-    <>
+    <Layout>
       <HeaderInvoices data={data} />
       {data.length > 0 ? (
         <Stack spacing={5}>
@@ -36,6 +37,6 @@ export const Home = () => {
           </Stack>
         </Stack>
       )}
-    </>
+    </Layout>
   )
 }

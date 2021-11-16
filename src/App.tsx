@@ -8,9 +8,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools />
-      <Container maxWidth={{ base: 'container.sm', md: 'container.md' }}>
-        <Router />
-      </Container>
+
+      <Router />
     </QueryClientProvider>
   )
 }

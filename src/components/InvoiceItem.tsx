@@ -16,6 +16,7 @@ import { format } from 'date-fns'
 import esLocale from 'date-fns/locale/es'
 import { Link } from 'react-router-dom'
 import { InvoiceId } from './InvoiceId'
+import { Status } from './Status'
 export function formatDateEs(date: string) {
   return format(new Date(date), 'dd MMM  yyyy', {
     locale: esLocale
@@ -88,46 +89,8 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
           rowSpan={{ base: 2, md: 1 }}
           rowStart={{ base: 3, md: 1 }}
           colSpan={{ base: 2, md: 3 }}
-          bg={`${invoice.status}.100`}
-          borderRadius={'lg'}
         >
-          <Stack
-            direction={'row'}
-            spacing={0}
-            justifyContent={'center'}
-            alignItems={'center'}
-          >
-            <Icon
-              width={9}
-              height={9}
-              color={`${
-                invoice.status === 'draft'
-                  ? colorMode === 'dark'
-                    ? 'texto.dark'
-                    : 'texto.bold'
-                  : `${invoice.status}.500`
-              }`}
-              as={BsDot}
-            />
-            <Text
-              fontWeight={'bold'}
-              color={`${
-                invoice.status === 'draft'
-                  ? colorMode === 'dark'
-                    ? 'texto.dark'
-                    : 'texto.bold'
-                  : `${invoice.status}.500`
-              }`}
-              textAlign={'center'}
-              paddingY={3}
-              paddingRight={3}
-            >
-              {invoice.status.replace(
-                invoice.status[0],
-                invoice.status[0].toUpperCase()
-              )}
-            </Text>
-          </Stack>
+          <Status status={invoice.status} />
         </GridItem>
         <GridItem hidden={hiddenArrowRight} placeSelf={'center'}>
           <Icon
