@@ -8,7 +8,9 @@ import {
   Button,
   Stack,
   Text,
-  useColorMode
+  useColorMode,
+  useDisclosure,
+  UseDisclosureReturn
 } from '@chakra-ui/react'
 import React from 'react'
 
@@ -19,7 +21,7 @@ export const ButtonsInvoice = ({
   id: string
   padding?: number
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
+  const alertDeleteDiclosure = useDisclosure()
   const { colorMode } = useColorMode()
   return (
     <>
@@ -52,7 +54,7 @@ export const ButtonsInvoice = ({
           borderRadius={'3xl'}
           padding={5}
           color={'white'}
-          onClick={() => setIsOpen(true)}
+          onClick={alertDeleteDiclosure.onOpen}
         >
           Delete
         </Button>
@@ -69,28 +71,27 @@ export const ButtonsInvoice = ({
           Mark as Paid
         </Button>
       </Stack>
-      <AlertDialogDelete isOpen={isOpen} setIsOpen={setIsOpen} idInvoice={id} />
+      <AlertDialogDelete diclosure={alertDeleteDiclosure} idInvoice={id} />
+      {/* <CreateInvoice isOpen={} /> */}
     </>
   )
 }
 
 function AlertDialogDelete({
-  isOpen,
-  setIsOpen,
-  idInvoice
+  idInvoice,
+  diclosure
 }: {
-  isOpen: boolean
-  setIsOpen: Function
+  diclosure: UseDisclosureReturn
   idInvoice: string
 }) {
   const cancelRef = React.useRef<any>()
   const { colorMode } = useColorMode()
   function onClose() {
-    setIsOpen(!isOpen)
+    diclosure.onClose()
   }
   return (
     <AlertDialog
-      isOpen={isOpen}
+      isOpen={diclosure.isOpen}
       leastDestructiveRef={cancelRef}
       onClose={onClose}
       motionPreset="slideInBottom"

@@ -1,10 +1,19 @@
 import React from 'react'
-import { Heading, Stack, Text, useBreakpointValue } from '@chakra-ui/react'
+import {
+  Heading,
+  Stack,
+  Text,
+  useBreakpointValue,
+  Icon,
+  useDisclosure
+} from '@chakra-ui/react'
 import { Invoice } from '../interfaces'
 import { FilterByStatus } from './FilterByStatus'
-
+import { AiFillPlusCircle } from 'react-icons/ai'
+import { CreateInvoice } from './CreateInvoice'
 export const HeaderInvoices = ({ data }: { data: Invoice[] }) => {
   const hidden = useBreakpointValue({ base: true, md: false })
+  const drawerCreateInvoiceDiclosure = useDisclosure()
   return (
     <Stack
       my={6}
@@ -25,7 +34,31 @@ export const HeaderInvoices = ({ data }: { data: Invoice[] }) => {
         </Text>
       </Stack>
 
-      <FilterByStatus status={['Draft', 'Pending', 'Paid']} />
+      <Stack direction={'row'} spacing={5}>
+        <FilterByStatus status={['Draft', 'Pending', 'Paid']} />
+
+        <Stack
+          direction={'row'}
+          alignItems={'center'}
+          borderRadius={'full'}
+          padding={'1'}
+          paddingRight={2}
+          role={'button'}
+          bg={'primary.500'}
+          color={'white'}
+          _hover={{
+            bg: 'primary.100'
+          }}
+          onClick={drawerCreateInvoiceDiclosure.onOpen}
+        >
+          <Icon as={AiFillPlusCircle} width={10} height={10} />
+          <Text color={'white'} fontSize={'xs'} fontWeight={'bold'}>
+            {hidden ? 'New' : 'New Invoice'}
+          </Text>
+        </Stack>
+      </Stack>
+
+      <CreateInvoice dicloruse={drawerCreateInvoiceDiclosure} />
     </Stack>
   )
 }
