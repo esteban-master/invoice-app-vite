@@ -1,9 +1,9 @@
-import { Box, Container, Stack, useBreakpointValue } from '@chakra-ui/react'
+import { Container, Stack, useBreakpointValue } from '@chakra-ui/react'
 import React from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { Outlet, useLocation, useParams } from 'react-router-dom'
 import { ButtonsInvoice } from './ButtonsInvoice'
 
-export const Layout: React.FC = ({ children }) => {
+export const Layout: React.FC = () => {
   const location = useLocation()
   const { id } = useParams()
   const isMobile = useBreakpointValue({ base: true, md: false })
@@ -15,7 +15,7 @@ export const Layout: React.FC = ({ children }) => {
       justifyContent={'space-between'}
     >
       <Container maxWidth={{ base: 'container.sm', md: 'container.md' }}>
-        {children}
+        <Outlet />
       </Container>
 
       {location.pathname.includes('/invoice/') && isMobile ? (

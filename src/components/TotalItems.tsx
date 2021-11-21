@@ -22,7 +22,6 @@ export const TotalItems = ({
 }) => {
   const { colorMode } = useColorMode()
   const isMobile = useBreakpointValue({ base: true, md: false })
-  console.log('ISMOBILE: ', isMobile)
   return (
     <Stack
       borderRadius={'lg'}

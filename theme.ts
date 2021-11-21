@@ -10,7 +10,7 @@ const theme: Partial<ChakraTheme> = {
     })
   },
   config: {
-    initialColorMode: 'light',
+    initialColorMode: 'dark',
     useSystemColorMode: false
   },
   colors: {

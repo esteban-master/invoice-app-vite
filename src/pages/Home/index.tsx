@@ -8,7 +8,7 @@ import { Layout } from '../../components/Layout'
 
 export const Home = () => {
   return (
-    <Layout>
+    <>
       <HeaderInvoices data={data} />
       {data.length > 0 ? (
         <Stack spacing={5}>
@@ -37,6 +37,6 @@ export const Home = () => {
           </Stack>
         </Stack>
       )}
-    </Layout>
+    </>
   )
 }

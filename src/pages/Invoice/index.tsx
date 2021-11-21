@@ -1,5 +1,4 @@
 import {
-  Box,
   Grid,
   GridItem,
   Icon,
@@ -15,7 +14,6 @@ import data from '../../../data.json'
 import { TotalItems } from '../../components/TotalItems'
 import { Link } from 'react-router-dom'
 import { MdOutlineKeyboardArrowLeft } from 'react-icons/md'
-import { Layout } from '../../components/Layout'
 import { ButtonsInvoice } from '../../components/ButtonsInvoice'
 import { Status } from '../../components/Status'
 export const Invoice = () => {
@@ -26,7 +24,7 @@ export const Invoice = () => {
 
   if (isMobile === undefined) return null
   return (
-    <Layout>
+    <>
       <Stack spacing={5}>
         <Link to={'/'}>
           <Stack direction={'row'} alignItems={'center'}>
@@ -141,6 +139,6 @@ export const Invoice = () => {
           </Stack>
         </Stack>
       </Stack>
-    </Layout>
+    </>
   )
 }
