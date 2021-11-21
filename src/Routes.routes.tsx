@@ -1,4 +1,5 @@
 import React from 'react'
+import { Grid, GridItem } from '@chakra-ui/react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { MenuNavbar } from './components/MenuNavbar'
@@ -8,15 +9,21 @@ import { Invoice } from './pages/Invoice'
 export default function Router() {
   return (
     <BrowserRouter>
-      <MenuNavbar />
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/invoice/:id" element={<Invoice />} />
-          <Route path="*" element={<NoMatch />} />
-        </Route>
-      </Routes>
+      <Grid templateColumns={{ base: '1fr', lg: '103px repeat(11, 1fr)' }}>
+        <GridItem colSpan={1}>
+          <MenuNavbar />
+        </GridItem>
+        <GridItem colSpan={11}>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/invoice/:id" element={<Invoice />} />
+              <Route path="*" element={<NoMatch />} />
+            </Route>
+          </Routes>
+        </GridItem>
+      </Grid>
     </BrowserRouter>
   )
 }

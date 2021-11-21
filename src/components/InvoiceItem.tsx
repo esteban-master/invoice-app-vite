@@ -31,7 +31,7 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
         rowGap={{ base: 2, md: 0 }}
         boxShadow={'sm'}
         paddingY={4}
-        paddingX={2}
+        paddingX={{ base: 4, md: 0 }}
         bg={colorMode === 'dark' ? 'bg_app.card' : 'white'}
         borderRadius={'lg'}
         templateColumns={{ base: 'repeat(4, 1fr)', md: 'repeat(15, 1fr)' }}
