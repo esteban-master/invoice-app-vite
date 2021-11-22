@@ -41,6 +41,10 @@ export const FilterByStatus = ({ status }: { status: string[] }) => {
                 id={s}
                 colorScheme={'primary'}
                 iconColor="white"
+                _checked={{
+                  bg: 'primary.500',
+                  borderColor: 'primary.500'
+                }}
                 _hover={{
                   borderColor: 'primary.500'
                 }}
