@@ -13,7 +13,7 @@ export default function Router() {
         <GridItem colSpan={1}>
           <MenuNavbar />
         </GridItem>
-        <GridItem colSpan={11}>
+        <GridItem paddingTop={12} colSpan={11}>
           <Routes>
             <Route element={<Layout />}>
               <Route index element={<Home />} />
