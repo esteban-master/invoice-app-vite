@@ -65,6 +65,12 @@ const theme: Partial<ChakraTheme> = {
         price: (props) => ({
           fontWeight: 'bold',
           color: mode('texto.light', 'texto.gray')(props)
+        }),
+        table: (props) => ({
+          fontFamily: 'Spartan',
+          textTransform: 'capitalize',
+          fontWeight: 'medium',
+          color: mode('texto.light', 'white')(props)
         })
       }
     },

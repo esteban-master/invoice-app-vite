@@ -17,7 +17,7 @@ export const MenuNavbar = () => {
   const { toggleColorMode, colorMode } = useColorMode()
   return (
     <Stack
-      height={{ lg: '100vh' }}
+      height={{ lg: '100%' }}
       bg={'bg_app.card'}
       as="nav"
       direction={{ lg: 'column' }}
