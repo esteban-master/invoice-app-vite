@@ -78,6 +78,11 @@ const theme: Partial<ChakraTheme> = {
       baseStyle: (props) => ({
         color: mode('texto.bold', 'white')(props)
       })
+    },
+    Input: {
+      defaultProps: {
+        errorBorderColor: '#EC5757'
+      }
     }
   }
 }

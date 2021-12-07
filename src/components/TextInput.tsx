@@ -10,10 +10,28 @@ import {
   useColorMode
 } from '@chakra-ui/react'
 
-export const TextInput = ({ label, ...props }: any) => {
+export const TextInput = ({
+  label,
+  input,
+  name,
+  type,
+  ...props
+}: {
+  label: string
+  type: string
+  input?: ({
+    field
+  }: {
+    field: Partial<FieldProps>
+    bg: string
+    type: string
+  }) => void
+  name: string
+}) => {
   const { colorMode } = useColorMode()
+  const bgColor = colorMode === 'dark' ? 'bg_app.card' : 'white'
   return (
-    <Field name={props.name}>
+    <Field name={name}>
       {({ field, meta }: FieldProps) => (
         <FormControl isInvalid={!!meta.error && meta.touched}>
           <Stack direction={'row'} justifyContent={'space-between'}>
@@ -26,12 +44,12 @@ export const TextInput = ({ label, ...props }: any) => {
               {meta.error}
             </FormErrorMessage>
           </Stack>
-          <Input
-            bg={colorMode === 'dark' ? 'bg_app.card' : 'white'}
-            errorBorderColor="#EC5757"
-            {...field}
-            {...props}
-          />
+
+          {input ? (
+            <>{input({ field: { field }, bg: bgColor, type })}</>
+          ) : (
+            <Input type={type} bg={bgColor} {...field} {...props} />
+          )}
         </FormControl>
       )}
     </Field>

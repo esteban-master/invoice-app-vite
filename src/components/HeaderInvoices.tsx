@@ -5,12 +5,14 @@ import {
   Text,
   useBreakpointValue,
   Icon,
-  useDisclosure
+  useDisclosure,
+  Spinner
 } from '@chakra-ui/react'
 import { Invoice } from '../interfaces'
 import { FilterByStatus } from './FilterByStatus'
 import { AiFillPlusCircle } from 'react-icons/ai'
-import { CreateInvoice } from './CreateInvoice'
+const CreateInvoice = React.lazy(() => import('./CreateInvoice'))
+
 export const HeaderInvoices = ({ data }: { data: Invoice[] }) => {
   const hidden = useBreakpointValue({ base: true, md: false })
   const drawerCreateInvoiceDiclosure = useDisclosure()
@@ -55,10 +57,13 @@ export const HeaderInvoices = ({ data }: { data: Invoice[] }) => {
           <Text color={'white'} fontSize={'xs'} fontWeight={'bold'}>
             {hidden ? 'New' : 'New Invoice'}
           </Text>
+          {drawerCreateInvoiceDiclosure.isOpen && (
+            <React.Suspense fallback={<Spinner size="md" />}>
+              <CreateInvoice diclosure={drawerCreateInvoiceDiclosure} />
+            </React.Suspense>
+          )}
         </Stack>
       </Stack>
-
-      <CreateInvoice dicloruse={drawerCreateInvoiceDiclosure} />
     </Stack>
   )
 }

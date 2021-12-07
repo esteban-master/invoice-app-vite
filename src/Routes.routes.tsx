@@ -5,6 +5,8 @@ import { Layout } from './components/Layout'
 import { MenuNavbar } from './components/MenuNavbar'
 import { Home } from './pages/Home'
 import { Invoice } from './pages/Invoice'
+import Invoices from './components/Invoices'
+import CreateInvoice from './components/CreateInvoice'
 
 export default function Router() {
   return (
@@ -17,8 +19,8 @@ export default function Router() {
           <Routes>
             <Route element={<Layout />}>
               <Route index element={<Home />} />
-              <Route path="/" element={<Home />} />
-              <Route path="/invoice/:id" element={<Invoice />} />
+              <Route path="/:id" element={<Invoice />} />
+
               <Route path="*" element={<NoMatch />} />
             </Route>
           </Routes>

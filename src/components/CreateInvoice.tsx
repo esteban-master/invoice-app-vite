@@ -14,12 +14,11 @@ import {
   Input,
   Stack,
   Text,
-  Icon,
   useBreakpointValue,
   useColorMode,
   UseDisclosureReturn,
   Button,
-  FormErrorMessage
+  DrawerCloseButton
 } from '@chakra-ui/react'
 import { MenuNavbar } from './MenuNavbar'
 import { ItemList } from './ItemList'
@@ -28,20 +27,16 @@ import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import { TextInput } from './TextInput'
 
-export const CreateInvoice = ({
-  dicloruse
-}: {
-  dicloruse: UseDisclosureReturn
-}) => {
+const CreateInvoice = ({ diclosure }: { diclosure: UseDisclosureReturn }) => {
   const firstField = React.useRef<any>()
   const { colorMode } = useColorMode()
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true })
   return (
     <Drawer
-      isOpen={dicloruse.isOpen}
+      isOpen={diclosure.isOpen}
       placement="left"
       initialFocusRef={firstField}
-      onClose={dicloruse.onClose}
+      onClose={diclosure.onClose}
       size={'lg'}
     >
       <DrawerOverlay>
@@ -58,6 +53,7 @@ export const CreateInvoice = ({
             )}
 
             <GridItem colSpan={{ lg: 4 }}>
+              <DrawerCloseButton />
               <DrawerHeader>New Invoice</DrawerHeader>
               <DrawerBody>
                 <Formik
@@ -94,7 +90,7 @@ export const CreateInvoice = ({
                     })
                   })}
                   onSubmit={(values) => {
-                    console.log(values)
+                    console.log('jajajaj: ', values)
                   }}
                 >
                   {(props) => (
@@ -112,6 +108,14 @@ export const CreateInvoice = ({
                             label="Street Address"
                             name="senderAddress.street"
                             type="text"
+                            input={({ field: { field }, type, bg }) => (
+                              <Input
+                                {...field}
+                                bg={bg}
+                                type={type}
+                                ref={firstField}
+                              />
+                            )}
                           />
 
                           <Stack direction={'row'} spacing={5}>
@@ -250,3 +254,5 @@ export const CreateInvoice = ({
     </Drawer>
   )
 }
+
+export default CreateInvoice
