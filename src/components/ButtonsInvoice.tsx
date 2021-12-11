@@ -84,7 +84,6 @@ export const ButtonsInvoice = ({
         diclosure={alertDeleteDiclosure}
         idInvoice={invoice.id}
       />
-      {/* <CreateInvoice isOpen={} /> */}
     </>
   )
 }

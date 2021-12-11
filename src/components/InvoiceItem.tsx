@@ -26,7 +26,7 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
   const { colorMode } = useColorMode()
   const hiddenArrowRight = useBreakpointValue({ base: true, md: false })
   return (
-    <Link to={`/${invoice.id}`}>
+    <Link to={`/invoice/${invoice.id}`}>
       <Grid
         rowGap={{ base: 2, md: 0 }}
         boxShadow={'sm'}

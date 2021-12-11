@@ -12,31 +12,8 @@ function App() {
 
       <InvoicesContextProvider>
         <Router />
-        {/* <Componente /> */}
       </InvoicesContextProvider>
     </QueryClientProvider>
-  )
-}
-
-const Componente = () => {
-  const { invoices, deleteInvoice, markAsPaid } = useInvoiceContext()
-  console.log('invoices: ', invoices, deleteInvoice)
-  return (
-    <div>
-      {invoices.map((i) => (
-        <li key={i.id}>
-          {' '}
-          {i.clientName} - {i.status} -
-          <button onClick={() => deleteInvoice(i.id)}>Delete</button>{' '}
-          <button
-            disabled={i.status === 'paid'}
-            onClick={() => markAsPaid(i.id)}
-          >
-            Mark as paid
-          </button>{' '}
-        </li>
-      ))}
-    </div>
   )
 }
 
