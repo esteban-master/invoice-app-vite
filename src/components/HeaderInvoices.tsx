@@ -11,9 +11,11 @@ import {
 import { Invoice } from '../interfaces'
 import { FilterByStatus } from './FilterByStatus'
 import { AiFillPlusCircle } from 'react-icons/ai'
+import { useInvoiceContext } from '../contextInvoice'
 const CreateInvoice = React.lazy(() => import('./CreateInvoice'))
 
-export const HeaderInvoices = ({ data }: { data: Invoice[] }) => {
+export const HeaderInvoices = () => {
+  const { invoices } = useInvoiceContext()
   const hidden = useBreakpointValue({ base: true, md: false })
   const drawerCreateInvoiceDiclosure = useDisclosure()
   return (
@@ -27,11 +29,11 @@ export const HeaderInvoices = ({ data }: { data: Invoice[] }) => {
         <Heading fontSize={'3xl'}>Invoices</Heading>
         <Text fontSize={'xs'}>
           {hidden
-            ? data.length > 0
-              ? `${data.length} invoices`
+            ? invoices.length > 0
+              ? `${invoices.length} invoices`
               : 'No invoices'
-            : data.length > 0
-            ? `There are ${data.length} total invoices`
+            : invoices.length > 0
+            ? `There are ${invoices.length} total invoices`
             : 'No invoices'}
         </Text>
       </Stack>

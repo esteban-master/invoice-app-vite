@@ -13,14 +13,19 @@ import {
   UseDisclosureReturn
 } from '@chakra-ui/react'
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useInvoiceContext } from '../contextInvoice'
+import { Invoice } from '../interfaces'
 
 export const ButtonsInvoice = ({
-  id,
+  invoice,
   padding = 0
 }: {
-  id: string
+  invoice: Invoice
   padding?: number
 }) => {
+  const { markAsPaid } = useInvoiceContext()
+
   const alertDeleteDiclosure = useDisclosure()
   const { colorMode } = useColorMode()
   return (
@@ -67,11 +72,18 @@ export const ButtonsInvoice = ({
           borderRadius={'3xl'}
           padding={5}
           color={'white'}
+          disabled={invoice.status === 'paid'}
+          onClick={() => {
+            markAsPaid(invoice.id)
+          }}
         >
           Mark as Paid
         </Button>
       </Stack>
-      <AlertDialogDelete diclosure={alertDeleteDiclosure} idInvoice={id} />
+      <AlertDialogDelete
+        diclosure={alertDeleteDiclosure}
+        idInvoice={invoice.id}
+      />
       {/* <CreateInvoice isOpen={} /> */}
     </>
   )
@@ -84,6 +96,8 @@ function AlertDialogDelete({
   diclosure: UseDisclosureReturn
   idInvoice: string
 }) {
+  let navigate = useNavigate()
+  const { deleteInvoice } = useInvoiceContext()
   const cancelRef = React.useRef<any>()
   const { colorMode } = useColorMode()
   function onClose() {
@@ -143,7 +157,11 @@ function AlertDialogDelete({
                 borderRadius={'3xl'}
                 padding={5}
                 color={'white'}
-                onClick={onClose}
+                onClick={() => {
+                  deleteInvoice(idInvoice)
+                  navigate('/')
+                  onClose()
+                }}
               >
                 Delete
               </Button>

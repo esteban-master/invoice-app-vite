@@ -10,15 +10,16 @@ import {
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { InvoiceId } from '../../components/InvoiceId'
-import data from '../../../data.json'
 import { TotalItems } from '../../components/TotalItems'
 import { Link } from 'react-router-dom'
 import { MdOutlineKeyboardArrowLeft } from 'react-icons/md'
 import { ButtonsInvoice } from '../../components/ButtonsInvoice'
 import { Status } from '../../components/Status'
+import { useInvoiceContext } from '../../contextInvoice'
 export const Invoice = () => {
   const { id } = useParams()
-  const invoiceData = data.find((invoice) => invoice.id === id)
+  const { invoices } = useInvoiceContext()
+  const invoiceData = invoices.find((invoice) => invoice.id === id)
   const { colorMode } = useColorMode()
   const isMobile = useBreakpointValue({ base: true, md: false })
 
@@ -60,7 +61,7 @@ export const Invoice = () => {
               <Status status={invoiceData?.status!} />
             </Stack>
 
-            {!isMobile && <ButtonsInvoice id={invoiceData?.id!} />}
+            {!isMobile && <ButtonsInvoice invoice={invoiceData!} />}
           </Stack>
         </Stack>
 

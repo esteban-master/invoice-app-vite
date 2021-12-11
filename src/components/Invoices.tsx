@@ -1,16 +1,18 @@
 import React from 'react'
 import { Stack, Image, Heading, Text } from '@chakra-ui/react'
-import data from '../../data.json'
+
 import { InvoiceItem } from './InvoiceItem'
 import empty from '/illustration-empty.svg'
+import { useInvoiceContext } from '../contextInvoice'
 
 const Invoices = () => {
+  const { invoices } = useInvoiceContext()
   return (
     <>
-      {data.length > 0 ? (
+      {invoices.length > 0 ? (
         <Stack spacing={5}>
-          {data.map((d) => (
-            <InvoiceItem key={d.id} invoice={d} />
+          {invoices.map((invoice) => (
+            <InvoiceItem key={invoice.id} invoice={invoice} />
           ))}
         </Stack>
       ) : (
