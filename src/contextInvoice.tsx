@@ -19,7 +19,7 @@ const InvoiceContext = createContext<null | {
 }>(null)
 
 export const InvoicesContextProvider: React.FC = ({ children }) => {
-  const [invoices, setInvoices] = useState<Invoice[]>(dataInvoices)
+  const [invoices, setInvoices] = useState<Invoice[]>(dataInvoices as Invoice[])
   const [filters, setFilters] = useState<Filters[]>([])
 
   const deleteInvoice = useCallback((id: string) => {
