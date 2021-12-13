@@ -39,7 +39,7 @@ export const HeaderInvoices = () => {
       </Stack>
 
       <Stack direction={'row'} spacing={5}>
-        <FilterByStatus status={['Draft', 'Pending', 'Paid']} />
+        <FilterByStatus status={['draft', 'pending', 'paid']} />
 
         <Stack
           direction={'row'}

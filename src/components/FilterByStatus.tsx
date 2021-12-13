@@ -13,10 +13,13 @@ import {
   useColorMode
 } from '@chakra-ui/react'
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md'
+import { Filters, useInvoiceContext } from '../contextInvoice'
 
-export const FilterByStatus = ({ status }: { status: string[] }) => {
+export const FilterByStatus = ({ status }: { status: Filters[] }) => {
   const { colorMode } = useColorMode()
   const hidden = useBreakpointValue({ base: true, md: false })
+  const { changeFilters, filters } = useInvoiceContext()
+
   return (
     <Menu>
       <MenuButton>
@@ -38,6 +41,8 @@ export const FilterByStatus = ({ status }: { status: string[] }) => {
           <MenuItem key={s} cursor={'pointer'} as="label" htmlFor={s}>
             <Stack direction={'row'} alignItems={'center'}>
               <Checkbox
+                onChange={() => changeFilters(s)}
+                isChecked={filters.includes(s)}
                 id={s}
                 colorScheme={'primary'}
                 iconColor="white"

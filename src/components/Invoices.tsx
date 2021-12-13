@@ -6,14 +6,20 @@ import empty from '/illustration-empty.svg'
 import { useInvoiceContext } from '../contextInvoice'
 
 const Invoices = () => {
-  const { invoices } = useInvoiceContext()
+  const { invoices, filters } = useInvoiceContext()
   return (
     <>
       {invoices.length > 0 ? (
         <Stack spacing={5}>
-          {invoices.map((invoice) => (
-            <InvoiceItem key={invoice.id} invoice={invoice} />
-          ))}
+          {filters.length > 0
+            ? invoices
+                .filter((invoice) => filters.includes(invoice.status))
+                .map((invoice) => (
+                  <InvoiceItem key={invoice.id} invoice={invoice} />
+                ))
+            : invoices.map((invoice) => (
+                <InvoiceItem key={invoice.id} invoice={invoice} />
+              ))}
         </Stack>
       ) : (
         <Stack

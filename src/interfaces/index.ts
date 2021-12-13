@@ -1,3 +1,5 @@
+import { Filters } from '../contextInvoice'
+
 export interface Invoice {
   id: string
   createdAt: string
@@ -6,7 +8,7 @@ export interface Invoice {
   paymentTerms: number
   clientName: string
   clientEmail: string
-  status: string
+  status: Filters
   senderAddress: Address
   clientAddress: Address
   items: Item[]

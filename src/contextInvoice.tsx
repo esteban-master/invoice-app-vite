@@ -7,18 +7,31 @@ import React, {
 } from 'react'
 import dataInvoices from '../data.json'
 import { Invoice } from './interfaces'
+
+export type Filters = 'draft' | 'pending' | 'paid'
+
 const InvoiceContext = createContext<null | {
   invoices: Invoice[]
-  // filter: 'All' | 'Draft' | 'Pending' | 'Paid',
+  filters: Filters[]
   deleteInvoice: (id: string) => void
   markAsPaid: (id: string) => void
+  changeFilters: (id: Filters) => void
 }>(null)
 
 export const InvoicesContextProvider: React.FC = ({ children }) => {
   const [invoices, setInvoices] = useState<Invoice[]>(dataInvoices)
+  const [filters, setFilters] = useState<Filters[]>([])
 
   const deleteInvoice = useCallback((id: string) => {
     setInvoices((prev) => prev.filter((invoice) => invoice.id !== id))
+  }, [])
+
+  const changeFilters = useCallback((filter: Filters) => {
+    setFilters((prev) =>
+      prev.includes(filter)
+        ? prev.filter((f) => f !== filter)
+        : prev.concat(filter)
+    )
   }, [])
 
   const markAsPaid = useCallback((id: string) => {
@@ -33,8 +46,8 @@ export const InvoicesContextProvider: React.FC = ({ children }) => {
   }, [])
 
   const value = useMemo(
-    () => ({ invoices, deleteInvoice, markAsPaid }),
-    [invoices, deleteInvoice, markAsPaid]
+    () => ({ invoices, filters, deleteInvoice, markAsPaid, changeFilters }),
+    [invoices, filters, deleteInvoice, markAsPaid]
   )
   return (
     <InvoiceContext.Provider value={value}>{children}</InvoiceContext.Provider>
