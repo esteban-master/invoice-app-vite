@@ -1,12 +1,13 @@
 import React from 'react'
 import { Grid, GridItem } from '@chakra-ui/react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { MenuNavbar } from './components/MenuNavbar'
 import { Home } from './pages/Home'
 import { Invoice } from './pages/Invoice'
-import Invoices from './components/Invoices'
 import CreateInvoice from './components/CreateInvoice'
+import CreateInvoicePage from './pages/CreateInvoice'
+import { Link } from 'react-router-dom'
 
 export default function Router() {
   return (
@@ -19,7 +20,9 @@ export default function Router() {
           <Routes>
             <Route element={<Layout />}>
               <Route index element={<Home />} />
+              {/* <Route index element={<Tetas />} /> */}
               <Route path="/invoice/:id" element={<Invoice />} />
+              <Route path="/invoice/new" element={<CreateInvoicePage />} />
 
               <Route path="*" element={<NoMatch />} />
             </Route>

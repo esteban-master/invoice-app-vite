@@ -140,6 +140,12 @@ export const Invoice = () => {
           </Stack>
         </Stack>
       </Stack>
+
+      {isMobile && (
+        <Stack position={'absolute'} bottom={0} left={0} right={0}>
+          <ButtonsInvoice padding={5} invoice={invoiceData!} />
+        </Stack>
+      )}
     </>
   )
 }

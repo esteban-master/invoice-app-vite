@@ -12,12 +12,26 @@ import { Invoice } from '../interfaces'
 import { FilterByStatus } from './FilterByStatus'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import { useInvoiceContext } from '../contextInvoice'
+import { useNavigate } from 'react-router-dom'
 const CreateInvoice = React.lazy(() => import('./CreateInvoice'))
 
 export const HeaderInvoices = () => {
   const { invoices } = useInvoiceContext()
+  const navigate = useNavigate()
+
   const hidden = useBreakpointValue({ base: true, md: false })
   const drawerCreateInvoiceDiclosure = useDisclosure()
+
+  function handleCreateInvoice() {
+    console.log('Mobile? ', hidden)
+    if (hidden) {
+      navigate('/invoice/new')
+    } else {
+      console.log('QUI')
+      drawerCreateInvoiceDiclosure.onOpen()
+    }
+  }
+
   return (
     <Stack
       my={6}
@@ -53,7 +67,7 @@ export const HeaderInvoices = () => {
           _hover={{
             bg: 'primary.100'
           }}
-          onClick={drawerCreateInvoiceDiclosure.onOpen}
+          onClick={handleCreateInvoice}
         >
           <Icon as={AiFillPlusCircle} width={10} height={10} />
           <Text color={'white'} fontSize={'xs'} fontWeight={'bold'}>
