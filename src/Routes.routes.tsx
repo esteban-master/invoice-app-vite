@@ -1,13 +1,14 @@
 import React from 'react'
-import { Grid, GridItem } from '@chakra-ui/react'
+import { Grid, GridItem, Spinner } from '@chakra-ui/react'
 import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { MenuNavbar } from './components/MenuNavbar'
 import { Home } from './pages/Home'
 import { Invoice } from './pages/Invoice'
-import CreateInvoice from './components/CreateInvoice'
-import CreateInvoicePage from './pages/CreateInvoice'
-import { Link } from 'react-router-dom'
+
+// import CreateInvoicePage from './pages/CreateInvoice'
+
+const CreateInvoicePage = React.lazy(() => import('./pages/CreateInvoice'))
 
 export default function Router() {
   return (
@@ -22,7 +23,15 @@ export default function Router() {
               <Route index element={<Home />} />
               {/* <Route index element={<Tetas />} /> */}
               <Route path="/invoice/:id" element={<Invoice />} />
-              <Route path="/invoice/new" element={<CreateInvoicePage />} />
+              <Route
+                path="/invoice/new"
+                element={
+                  <React.Suspense fallback={<Spinner />}>
+                    <CreateInvoicePage />
+                  </React.Suspense>
+                }
+              />
+              {/* <Route path="/invoice/new" element={<CreateInvoicePage />} /> */}
 
               <Route path="*" element={<NoMatch />} />
             </Route>

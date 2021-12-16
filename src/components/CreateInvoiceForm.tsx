@@ -1,8 +1,10 @@
-import React from 'react'
-import { Form, Formik } from 'formik'
+import React, { useState } from 'react'
+import { FieldArray, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import { TextInput } from './TextInput'
-import { ItemList } from './ItemList'
+
+import addDays from 'date-fns/addDays'
+
 import { FaPlus } from 'react-icons/fa'
 import {
   Heading,
@@ -17,11 +19,26 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem
+  MenuItem,
+  GridItem,
+  Grid,
+  Icon
 } from '@chakra-ui/react'
 import { BsChevronDown } from 'react-icons/bs'
-const CreateInvoiceForm = ({ firstField }: any) => {
+import { AiFillDelete } from 'react-icons/ai'
+import { Item } from '../interfaces'
+import { formatDateEs } from '../utils/formatDateEs'
+import { Filters, useInvoiceContext } from '../contextInvoice'
+
+const CreateInvoiceForm = ({ firstField, submit }: any) => {
   const { colorMode } = useColorMode()
+  const [status, setStatus] = useState<Filters>('draft')
+  const { invoices, addNewInvoice } = useInvoiceContext()
+
+  function handleSubmit(formik: any, status: 'draft' | 'pending') {
+    setStatus(status)
+    formik.submitForm()
+  }
 
   return (
     <Formik
@@ -42,11 +59,22 @@ const CreateInvoiceForm = ({ firstField }: any) => {
           city: '',
           postCode: '',
           country: ''
-        }
+        },
+        items: [
+          {
+            name: '',
+            quantity: 0,
+            price: 0,
+            total: 0
+          }
+        ]
       }}
       validationSchema={Yup.object({
         clientName: Yup.string().required("can't be empty"),
-        clientEmail: Yup.string().email('Ingresa un email valido'),
+        paymentTerms: Yup.number().required("can't be empty"),
+        clientEmail: Yup.string()
+          .required("can't be empty")
+          .email('Ingresa un email valido'),
         senderAddress: Yup.object({
           street: Yup.string().required("can't be empty"),
           city: Yup.string().required("can't be empty"),
@@ -54,14 +82,39 @@ const CreateInvoiceForm = ({ firstField }: any) => {
           country: Yup.string().required("can't be empty")
         }),
         clientAddress: Yup.object({
-          street: Yup.string(),
-          city: Yup.string(),
-          postCode: Yup.string(),
-          country: Yup.string()
+          street: Yup.string().required("can't be empty"),
+          city: Yup.string().required("can't be empty"),
+          postCode: Yup.string().required("can't be empty"),
+          country: Yup.string().required("can't be empty")
         })
       })}
       onSubmit={(values) => {
-        console.log('jajajaj: ', values)
+        const { items, total } = values.items.reduce<{
+          total: number
+          items: Item[]
+        }>(
+          (acc, item) => {
+            let newItem = { ...item, total: item.price * item.quantity }
+            acc.items.push(newItem)
+            acc.total += newItem.total
+            return acc
+          },
+          { total: 0, items: [] }
+        )
+        const paymentDue = formatDateEs(
+          addDays(new Date(values.createdAt), values.paymentTerms),
+          'yyyy-MM-dd'
+        )
+
+        addNewInvoice({
+          ...values,
+          items,
+          total,
+          status,
+          paymentDue,
+          id: `IDRAN-${invoices.length}`
+        })
+        submit()
       }}
     >
       {(formik) => (
@@ -152,38 +205,100 @@ const CreateInvoiceForm = ({ firstField }: any) => {
                   Item List
                 </Heading>
 
-                <ItemList
-                  items={[
-                    {
-                      name: 'Banner Design',
-                      quantity: 1,
-                      price: 156.0,
-                      total: 156.0
-                    },
-                    {
-                      name: 'Email Design',
-                      quantity: 2,
-                      price: 200.0,
-                      total: 400.0
-                    }
-                  ]}
-                />
+                <FieldArray name="items">
+                  {({ insert, remove, push }) => (
+                    <Stack spacing={8}>
+                      {formik.values.items.length > 0 &&
+                        formik.values.items.map((item, index) => (
+                          <Grid
+                            key={index}
+                            templateColumns={{
+                              base: 'repeat(6, 1fr)',
+                              md: 'repeat(8, 1fr)'
+                            }}
+                            columnGap={2}
+                            rowGap={4}
+                          >
+                            <GridItem colSpan={{ base: 6, md: 3 }}>
+                              <TextInput
+                                label="Item Name"
+                                name={`items.${index}.name`}
+                                type="text"
+                              />
+                            </GridItem>
+                            <GridItem>
+                              <TextInput
+                                label="Qty."
+                                name={`items.${index}.quantity`}
+                                type="number"
+                              />
+                            </GridItem>
+                            <GridItem colSpan={2}>
+                              <TextInput
+                                label="Price"
+                                name={`items.${index}.price`}
+                                type="number"
+                              />
+                            </GridItem>
+                            <GridItem colSpan={2}>
+                              <TextInput
+                                label="Total"
+                                name={`items.${index}.total`}
+                                type="number"
+                                value={
+                                  formik.getFieldProps(`items.${index}.price`)
+                                    .value *
+                                  formik.getFieldProps(
+                                    `items.${index}.quantity`
+                                  ).value
+                                }
+                              />
+                            </GridItem>
+                            <GridItem alignSelf={'end'} justifySelf={'center'}>
+                              <Icon
+                                cursor={'pointer'}
+                                width={7}
+                                height={7}
+                                as={AiFillDelete}
+                                onClick={() => remove(index)}
+                              />
+                            </GridItem>
+                          </Grid>
+                        ))}
 
-                <Button
-                  borderRadius={'3xl'}
-                  leftIcon={<FaPlus />}
-                  paddingY={5}
-                  color={colorMode === 'dark' ? 'texto.gray' : 'texto.light'}
-                  bg={colorMode === 'dark' ? 'bg_app.gray' : '#F9FAFE'}
-                  fontSize={'xs'}
-                  fontWeight={'bold'}
-                >
-                  Add New Item
-                </Button>
+                      <Button
+                        borderRadius={'3xl'}
+                        leftIcon={<FaPlus />}
+                        paddingY={5}
+                        color={
+                          colorMode === 'dark' ? 'texto.gray' : 'texto.light'
+                        }
+                        bg={colorMode === 'dark' ? 'bg_app.gray' : '#F9FAFE'}
+                        fontSize={'xs'}
+                        fontWeight={'bold'}
+                        onClick={() =>
+                          push({
+                            name: '',
+                            quantity: 0,
+                            price: 0,
+                            total: 0
+                          })
+                        }
+                      >
+                        Add New Item
+                      </Button>
+                    </Stack>
+                  )}
+                </FieldArray>
               </Stack>
             </Stack>
           </Stack>
-          <Button type="submit">Submit</Button>
+          <Button onClick={() => handleSubmit(formik, 'draft')}>
+            Save as Draf
+          </Button>
+          <Button onClick={() => handleSubmit(formik, 'pending')}>
+            Save & Send
+          </Button>
         </Form>
       )}
     </Formik>

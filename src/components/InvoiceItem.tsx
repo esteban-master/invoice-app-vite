@@ -1,6 +1,5 @@
 import React from 'react'
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md'
-import { BsDot } from 'react-icons/bs'
 import {
   Grid,
   GridItem,
@@ -8,20 +7,14 @@ import {
   Text,
   Box,
   useColorMode,
-  Icon,
-  Stack
+  Icon
 } from '@chakra-ui/react'
 import { Invoice } from '../interfaces'
-import { format } from 'date-fns'
-import esLocale from 'date-fns/locale/es'
 import { Link } from 'react-router-dom'
 import { InvoiceId } from './InvoiceId'
 import { Status } from './Status'
-export function formatDateEs(date: string) {
-  return format(new Date(date), 'dd MMM  yyyy', {
-    locale: esLocale
-  })
-}
+import { formatDateEs } from '../utils/formatDateEs'
+
 export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
   const { colorMode } = useColorMode()
   const hiddenArrowRight = useBreakpointValue({ base: true, md: false })
@@ -69,7 +62,7 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
             >
               Due
             </Box>{' '}
-            {formatDateEs(invoice.paymentDue)}
+            {formatDateEs(new Date(invoice.paymentDue), 'dd MMM yyyy')}
           </Text>
         </GridItem>
         <GridItem
@@ -79,7 +72,7 @@ export const InvoiceItem = ({ invoice }: { invoice: Invoice }) => {
           colSpan={{ base: 2, md: 3 }}
         >
           <Text fontSize={'sm'} variant={'bold'}>
-            &euro; 1.800.90
+            &euro; {invoice.total}
           </Text>
         </GridItem>
         <GridItem

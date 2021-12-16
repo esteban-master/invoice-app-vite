@@ -15,7 +15,7 @@ export const TextInput = ({
   input,
   name,
   type,
-  ...props
+  value
 }: {
   label: string
   type: string
@@ -27,6 +27,7 @@ export const TextInput = ({
     type: string
   }) => void
   name: string
+  value?: number | string
 }) => {
   const { colorMode } = useColorMode()
   const bgColor = colorMode === 'dark' ? 'bg_app.card' : 'white'
@@ -48,7 +49,7 @@ export const TextInput = ({
           {input ? (
             <>{input({ field: { field }, bg: bgColor, type })}</>
           ) : (
-            <Input type={type} bg={bgColor} {...field} {...props} />
+            <Input type={type} bg={bgColor} {...field} value={value} />
           )}
         </FormControl>
       )}

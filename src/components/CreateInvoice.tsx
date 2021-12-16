@@ -46,7 +46,10 @@ const CreateInvoice = ({ diclosure }: { diclosure: UseDisclosureReturn }) => {
               <DrawerCloseButton />
               <DrawerHeader>New Invoice</DrawerHeader>
               <DrawerBody>
-                <CreateInvoiceForm firstField={firstField} />
+                <CreateInvoiceForm
+                  firstField={firstField}
+                  submit={() => diclosure.onClose()}
+                />
               </DrawerBody>
               <DrawerFooter>Footer</DrawerFooter>
             </GridItem>

@@ -14,6 +14,7 @@ const InvoiceContext = createContext<null | {
   invoices: Invoice[]
   filters: Filters[]
   deleteInvoice: (id: string) => void
+  addNewInvoice: (invoice: Invoice) => void
   markAsPaid: (id: string) => void
   changeFilters: (id: Filters) => void
 }>(null)
@@ -24,6 +25,9 @@ export const InvoicesContextProvider: React.FC = ({ children }) => {
 
   const deleteInvoice = useCallback((id: string) => {
     setInvoices((prev) => prev.filter((invoice) => invoice.id !== id))
+  }, [])
+  const addNewInvoice = useCallback((invoice: Invoice) => {
+    setInvoices((prev) => [invoice, ...prev])
   }, [])
 
   const changeFilters = useCallback((filter: Filters) => {
@@ -46,8 +50,15 @@ export const InvoicesContextProvider: React.FC = ({ children }) => {
   }, [])
 
   const value = useMemo(
-    () => ({ invoices, filters, deleteInvoice, markAsPaid, changeFilters }),
-    [invoices, filters, deleteInvoice, markAsPaid]
+    () => ({
+      invoices,
+      filters,
+      deleteInvoice,
+      markAsPaid,
+      changeFilters,
+      addNewInvoice
+    }),
+    [invoices, filters, deleteInvoice, markAsPaid, addNewInvoice]
   )
   return (
     <InvoiceContext.Provider value={value}>{children}</InvoiceContext.Provider>

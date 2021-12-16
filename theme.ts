@@ -76,7 +76,8 @@ const theme: Partial<ChakraTheme> = {
     },
     Heading: {
       baseStyle: (props) => ({
-        color: mode('texto.bold', 'white')(props)
+        color: mode('texto.bold', 'white')(props),
+        fontFamily: 'Spartan'
       })
     },
     Input: {
