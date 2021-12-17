@@ -23,11 +23,9 @@ export const HeaderInvoices = () => {
   const drawerCreateInvoiceDiclosure = useDisclosure()
 
   function handleCreateInvoice() {
-    console.log('Mobile? ', hidden)
     if (hidden) {
       navigate('/invoice/new')
     } else {
-      console.log('QUI')
       drawerCreateInvoiceDiclosure.onOpen()
     }
   }

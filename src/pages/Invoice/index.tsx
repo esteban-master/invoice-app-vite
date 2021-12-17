@@ -25,7 +25,7 @@ export const Invoice = () => {
 
   if (isMobile === undefined) return null
   return (
-    <>
+    <Stack spacing={5}>
       <Stack spacing={5}>
         <Link to={'/'}>
           <Stack direction={'row'} alignItems={'center'}>
@@ -142,10 +142,10 @@ export const Invoice = () => {
       </Stack>
 
       {isMobile && (
-        <Stack position={'absolute'} bottom={0} left={0} right={0}>
+        <Stack>
           <ButtonsInvoice padding={5} invoice={invoiceData!} />
         </Stack>
       )}
-    </>
+    </Stack>
   )
 }

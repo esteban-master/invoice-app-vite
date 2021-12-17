@@ -22,7 +22,10 @@ const CreateInvoicePage = () => {
       </Link>
 
       <Heading variant={'h1'}>New Invoice</Heading>
-      <CreateInvoiceForm submit={() => navigate('/')} />
+      <CreateInvoiceForm
+        submit={() => navigate('/')}
+        discard={() => navigate('/')}
+      />
     </Stack>
   )
 }

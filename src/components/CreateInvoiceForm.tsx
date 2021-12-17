@@ -30,7 +30,7 @@ import { Item } from '../interfaces'
 import { formatDateEs } from '../utils/formatDateEs'
 import { Filters, useInvoiceContext } from '../contextInvoice'
 
-const CreateInvoiceForm = ({ firstField, submit }: any) => {
+const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
   const { colorMode } = useColorMode()
   const [status, setStatus] = useState<Filters>('draft')
   const { invoices, addNewInvoice } = useInvoiceContext()
@@ -63,14 +63,16 @@ const CreateInvoiceForm = ({ firstField, submit }: any) => {
         items: [
           {
             name: '',
-            quantity: 0,
-            price: 0,
+            quantity: '',
+            price: '',
             total: 0
           }
         ]
       }}
       validationSchema={Yup.object({
         clientName: Yup.string().required("can't be empty"),
+        createdAt: Yup.string().required("can't be empty"),
+        description: Yup.string().required("can't be empty"),
         paymentTerms: Yup.number().required("can't be empty"),
         clientEmail: Yup.string()
           .required("can't be empty")
@@ -86,7 +88,17 @@ const CreateInvoiceForm = ({ firstField, submit }: any) => {
           city: Yup.string().required("can't be empty"),
           postCode: Yup.string().required("can't be empty"),
           country: Yup.string().required("can't be empty")
-        })
+        }),
+        items: Yup.array()
+          .min(1)
+          .of(
+            Yup.object({
+              name: Yup.string().required("can't be empty"),
+              quantity: Yup.number().required("can't be empty"),
+              price: Yup.number().required("can't be empty"),
+              total: Yup.number().required("can't be empty")
+            })
+          )
       })}
       onSubmit={(values) => {
         const { items, total } = values.items.reduce<{
@@ -94,7 +106,12 @@ const CreateInvoiceForm = ({ firstField, submit }: any) => {
           items: Item[]
         }>(
           (acc, item) => {
-            let newItem = { ...item, total: item.price * item.quantity }
+            let newItem: Item = {
+              ...item,
+              quantity: Number(item.quantity),
+              price: Number(item.price),
+              total: Number(Number(item.price) * Number(item.quantity))
+            }
             acc.items.push(newItem)
             acc.total += newItem.total
             return acc
@@ -112,7 +129,7 @@ const CreateInvoiceForm = ({ firstField, submit }: any) => {
           total,
           status,
           paymentDue,
-          id: `IDRAN-${invoices.length}`
+          id: `RANDOM${invoices.length}`
         })
         submit()
       }}
@@ -120,185 +137,250 @@ const CreateInvoiceForm = ({ firstField, submit }: any) => {
       {(formik) => (
         <Form>
           <Stack spacing={10}>
-            <Stack spacing={6}>
-              <Heading as="h2" fontSize={'xs'} color={'primary.500'}>
-                Bill From
-              </Heading>
-              <TextInput
-                label="Street Address"
-                name="senderAddress.street"
-                type="text"
-                input={({ field: { field }, type, bg }) => (
-                  <Input {...field} bg={bg} type={type} ref={firstField} />
-                )}
-              />
+            <Stack spacing={10}>
+              <Stack spacing={6}>
+                <Heading as="h2" fontSize={'xs'} color={'primary.500'}>
+                  Bill From
+                </Heading>
+                <TextInput
+                  label="Street Address"
+                  name="senderAddress.street"
+                  type="text"
+                  input={({ field: { field }, type, bg }) => (
+                    <Input
+                      fontWeight={'bold'}
+                      {...field}
+                      bg={bg}
+                      type={type}
+                      ref={firstField}
+                    />
+                  )}
+                />
 
-              <Stack direction={'row'} spacing={5}>
-                <TextInput label="City" name="senderAddress.city" type="text" />
+                <Stack direction={'row'} spacing={5}>
+                  <TextInput
+                    label="City"
+                    name="senderAddress.city"
+                    type="text"
+                  />
+                  <TextInput
+                    label="Post Code"
+                    name="senderAddress.postCode"
+                    type="text"
+                  />
+                  <TextInput
+                    label="Country"
+                    name="senderAddress.country"
+                    type="text"
+                  />
+                </Stack>
+              </Stack>
+
+              <Stack spacing={6}>
+                <Heading as="h2" fontSize={'xs'} color={'primary.500'}>
+                  Bill From
+                </Heading>
                 <TextInput
-                  label="Post Code"
-                  name="senderAddress.postCode"
+                  label="Client's Name"
+                  name="clientName"
                   type="text"
                 />
                 <TextInput
-                  label="Country"
-                  name="senderAddress.country"
+                  label="Client's Email"
+                  name="clientEmail"
+                  type="email"
+                />
+                <TextInput
+                  label="Street Address"
+                  name="clientAddress.street"
                   type="text"
                 />
+
+                <Stack direction={'row'} spacing={5}>
+                  <TextInput
+                    label="City"
+                    name="clientAddress.city"
+                    type="text"
+                  />
+                  <TextInput
+                    label="Post Code"
+                    name="clientAddress.postCode"
+                    type="text"
+                  />
+                  <TextInput
+                    label="Country"
+                    name="clientAddress.country"
+                    type="text"
+                  />
+                </Stack>
+                <Stack direction={'row'}>
+                  <Box width={'50%'}>
+                    <TextInput
+                      label="Invoice Date"
+                      name="createdAt"
+                      type="date"
+                    />
+                  </Box>
+
+                  <Box width={'50%'}>
+                    <SelectPaymentTerms
+                      items={items}
+                      formik={formik}
+                      label={'Payment Terms'}
+                      value={formik.getFieldMeta('paymentTerms').value}
+                    />
+                  </Box>
+                </Stack>
+                <TextInput
+                  label="Project Description"
+                  name="description"
+                  type="text"
+                />
+                <Stack spacing={8}>
+                  <Heading fontSize={'lg'} color={'#777F98'}>
+                    Item List
+                  </Heading>
+
+                  <FieldArray name="items">
+                    {({ insert, remove, push }) => (
+                      <Stack spacing={8}>
+                        {formik.values.items.length > 0 &&
+                          formik.values.items.map((item, index) => (
+                            <Grid
+                              key={index}
+                              templateColumns={{
+                                base: 'repeat(6, 1fr)',
+                                md: 'repeat(9, 1fr)'
+                              }}
+                              columnGap={2}
+                              rowGap={4}
+                            >
+                              <GridItem colSpan={{ base: 6, md: 3 }}>
+                                <TextInput
+                                  label="Item Name"
+                                  name={`items.${index}.name`}
+                                  type="text"
+                                />
+                              </GridItem>
+                              <GridItem>
+                                <TextInput
+                                  label="Qty."
+                                  name={`items.${index}.quantity`}
+                                  type="number"
+                                />
+                              </GridItem>
+                              <GridItem colSpan={2}>
+                                <TextInput
+                                  label="Price"
+                                  name={`items.${index}.price`}
+                                  type="number"
+                                />
+                              </GridItem>
+                              <GridItem colSpan={2}>
+                                <TextInput
+                                  label="Total"
+                                  name={`items.${index}.total`}
+                                  type="number"
+                                  value={
+                                    formik.getFieldProps(`items.${index}.price`)
+                                      .value *
+                                    formik.getFieldProps(
+                                      `items.${index}.quantity`
+                                    ).value
+                                  }
+                                />
+                              </GridItem>
+                              <GridItem
+                                alignSelf={'end'}
+                                justifySelf={'center'}
+                              >
+                                <Icon
+                                  _hover={{
+                                    color: 'red_custom.500'
+                                  }}
+                                  cursor={'pointer'}
+                                  width={7}
+                                  height={7}
+                                  as={AiFillDelete}
+                                  onClick={() => remove(index)}
+                                />
+                              </GridItem>
+                            </Grid>
+                          ))}
+
+                        <Button
+                          borderRadius={'3xl'}
+                          leftIcon={<FaPlus />}
+                          paddingY={5}
+                          color={
+                            colorMode === 'dark' ? 'texto.dark' : 'texto.light'
+                          }
+                          bg={colorMode === 'dark' ? 'bg_app.gray' : '#F9FAFE'}
+                          fontSize={'xs'}
+                          fontWeight={'bold'}
+                          onClick={() =>
+                            push({
+                              name: '',
+                              quantity: 0,
+                              price: 0,
+                              total: 0
+                            })
+                          }
+                        >
+                          Add New Item
+                        </Button>
+                      </Stack>
+                    )}
+                  </FieldArray>
+                </Stack>
               </Stack>
             </Stack>
-
-            <Stack spacing={6}>
-              <Heading as="h2" fontSize={'xs'} color={'primary.500'}>
-                Bill From
-              </Heading>
-              <TextInput label="Client's Name" name="clientName" type="text" />
-              <TextInput
-                label="Client's Email"
-                name="clientEmail"
-                type="email"
-              />
-              <TextInput
-                label="Street Address"
-                name="clientAddress.street"
-                type="text"
-              />
-
-              <Stack direction={'row'} spacing={5}>
-                <TextInput label="City" name="clientAddress.city" type="text" />
-                <TextInput
-                  label="Post Code"
-                  name="clientAddress.postCode"
-                  type="text"
-                />
-                <TextInput
-                  label="Country"
-                  name="clientAddress.country"
-                  type="text"
-                />
-              </Stack>
+            <Stack direction={'row'} justifyContent={'space-between'}>
+              <Button
+                onClick={discard}
+                _hover={{
+                  bg: colorMode === 'dark' ? 'white' : 'texto.dark',
+                  color: 'texto.light'
+                }}
+                bg={colorMode === 'dark' ? 'bg_app.gray' : '#F9FAFE'}
+                borderRadius={'3xl'}
+                padding={5}
+                fontSize={'xs'}
+                color={colorMode === 'dark' ? 'texto.dark' : 'texto.light'}
+              >
+                Discard
+              </Button>
               <Stack direction={'row'}>
-                <Box width={'50%'}>
-                  <TextInput
-                    label="Invoice Date"
-                    name="createdAt"
-                    type="date"
-                  />
-                </Box>
-
-                <Box width={'50%'}>
-                  <SelectPaymentTerms
-                    items={items}
-                    formik={formik}
-                    label={'Payment Terms'}
-                    value={formik.getFieldMeta('paymentTerms').value}
-                  />
-                </Box>
-              </Stack>
-              <TextInput
-                label="Project Description"
-                name="description"
-                type="text"
-              />
-              <Stack spacing={8}>
-                <Heading fontSize={'lg'} color={'#777F98'}>
-                  Item List
-                </Heading>
-
-                <FieldArray name="items">
-                  {({ insert, remove, push }) => (
-                    <Stack spacing={8}>
-                      {formik.values.items.length > 0 &&
-                        formik.values.items.map((item, index) => (
-                          <Grid
-                            key={index}
-                            templateColumns={{
-                              base: 'repeat(6, 1fr)',
-                              md: 'repeat(8, 1fr)'
-                            }}
-                            columnGap={2}
-                            rowGap={4}
-                          >
-                            <GridItem colSpan={{ base: 6, md: 3 }}>
-                              <TextInput
-                                label="Item Name"
-                                name={`items.${index}.name`}
-                                type="text"
-                              />
-                            </GridItem>
-                            <GridItem>
-                              <TextInput
-                                label="Qty."
-                                name={`items.${index}.quantity`}
-                                type="number"
-                              />
-                            </GridItem>
-                            <GridItem colSpan={2}>
-                              <TextInput
-                                label="Price"
-                                name={`items.${index}.price`}
-                                type="number"
-                              />
-                            </GridItem>
-                            <GridItem colSpan={2}>
-                              <TextInput
-                                label="Total"
-                                name={`items.${index}.total`}
-                                type="number"
-                                value={
-                                  formik.getFieldProps(`items.${index}.price`)
-                                    .value *
-                                  formik.getFieldProps(
-                                    `items.${index}.quantity`
-                                  ).value
-                                }
-                              />
-                            </GridItem>
-                            <GridItem alignSelf={'end'} justifySelf={'center'}>
-                              <Icon
-                                cursor={'pointer'}
-                                width={7}
-                                height={7}
-                                as={AiFillDelete}
-                                onClick={() => remove(index)}
-                              />
-                            </GridItem>
-                          </Grid>
-                        ))}
-
-                      <Button
-                        borderRadius={'3xl'}
-                        leftIcon={<FaPlus />}
-                        paddingY={5}
-                        color={
-                          colorMode === 'dark' ? 'texto.gray' : 'texto.light'
-                        }
-                        bg={colorMode === 'dark' ? 'bg_app.gray' : '#F9FAFE'}
-                        fontSize={'xs'}
-                        fontWeight={'bold'}
-                        onClick={() =>
-                          push({
-                            name: '',
-                            quantity: 0,
-                            price: 0,
-                            total: 0
-                          })
-                        }
-                      >
-                        Add New Item
-                      </Button>
-                    </Stack>
-                  )}
-                </FieldArray>
+                <Button
+                  onClick={() => handleSubmit(formik, 'draft')}
+                  _hover={{
+                    bg: colorMode === 'dark' ? 'bg_app.gray' : 'texto.dark',
+                    color: 'white'
+                  }}
+                  bg={colorMode === 'dark' ? 'draft.500' : 'draft.500'}
+                  borderRadius={'3xl'}
+                  padding={5}
+                  fontSize={'xs'}
+                  color={colorMode === 'dark' ? 'texto.dark' : 'texto.light'}
+                >
+                  Save as Draf
+                </Button>
+                <Button
+                  onClick={() => handleSubmit(formik, 'pending')}
+                  _hover={{
+                    bg: 'primary.100'
+                  }}
+                  fontSize={'xs'}
+                  bg={'primary.500'}
+                  borderRadius={'3xl'}
+                  padding={5}
+                  color={'white'}
+                >
+                  Save & Send
+                </Button>
               </Stack>
             </Stack>
           </Stack>
-          <Button onClick={() => handleSubmit(formik, 'draft')}>
-            Save as Draf
-          </Button>
-          <Button onClick={() => handleSubmit(formik, 'pending')}>
-            Save & Send
-          </Button>
         </Form>
       )}
     </Formik>

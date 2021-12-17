@@ -33,26 +33,35 @@ export const TextInput = ({
   const bgColor = colorMode === 'dark' ? 'bg_app.card' : 'white'
   return (
     <Field name={name}>
-      {({ field, meta }: FieldProps) => (
-        <FormControl isInvalid={!!meta.error && meta.touched}>
-          <Stack direction={'row'} justifyContent={'space-between'}>
-            <FormLabel>
-              <Text color={meta.error && meta.touched ? '#EC5757' : ''}>
-                {label}
-              </Text>
-            </FormLabel>
-            <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
-              {meta.error}
-            </FormErrorMessage>
-          </Stack>
+      {({ field, meta }: FieldProps) => {
+        return (
+          <FormControl isInvalid={!!meta.error && meta.touched}>
+            <Stack direction={'row'} justifyContent={'space-between'}>
+              <FormLabel>
+                <Text color={meta.error && meta.touched ? '#EC5757' : ''}>
+                  {label}
+                </Text>
+              </FormLabel>
+              <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
+                {meta.error}
+              </FormErrorMessage>
+            </Stack>
 
-          {input ? (
-            <>{input({ field: { field }, bg: bgColor, type })}</>
-          ) : (
-            <Input type={type} bg={bgColor} {...field} value={value} />
-          )}
-        </FormControl>
-      )}
+            {input ? (
+              <>{input({ field: { field }, bg: bgColor, type })}</>
+            ) : (
+              <Input
+                fontWeight={'bold'}
+                type={type}
+                bg={bgColor}
+                {...field}
+                disabled={label === 'Total'}
+                value={value}
+              />
+            )}
+          </FormControl>
+        )
+      }}
     </Field>
   )
 }

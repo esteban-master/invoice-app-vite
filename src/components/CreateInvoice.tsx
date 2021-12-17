@@ -49,6 +49,7 @@ const CreateInvoice = ({ diclosure }: { diclosure: UseDisclosureReturn }) => {
                 <CreateInvoiceForm
                   firstField={firstField}
                   submit={() => diclosure.onClose()}
+                  discard={() => diclosure.onClose()}
                 />
               </DrawerBody>
               <DrawerFooter>Footer</DrawerFooter>
