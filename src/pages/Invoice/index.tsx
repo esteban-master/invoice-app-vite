@@ -16,6 +16,7 @@ import { MdOutlineKeyboardArrowLeft } from 'react-icons/md'
 import { ButtonsInvoice } from '../../components/ButtonsInvoice'
 import { Status } from '../../components/Status'
 import { useInvoiceContext } from '../../contextInvoice'
+import { formatDateEs } from '../../utils/formatDateEs'
 export const Invoice = () => {
   const { id } = useParams()
   const { invoices } = useInvoiceContext()
@@ -97,7 +98,10 @@ export const Invoice = () => {
                 <Stack>
                   <Text> Invoice Date </Text>
                   <Text fontSize={'sm'} variant={'bold'}>
-                    21 Aug 2021
+                    {formatDateEs(
+                      new Date(invoiceData?.createdAt!),
+                      'dd MMM yyyy'
+                    )}
                   </Text>
                 </Stack>
               </GridItem>
@@ -118,7 +122,10 @@ export const Invoice = () => {
               <GridItem colSpan={{ base: 2, md: 2 }}>
                 <Text>Payment Due</Text>
                 <Text fontSize={'sm'} variant={'bold'}>
-                  20 Sep 2021
+                  {formatDateEs(
+                    new Date(invoiceData?.paymentDue!),
+                    'dd MMM yyyy'
+                  )}
                 </Text>
               </GridItem>
               <GridItem
