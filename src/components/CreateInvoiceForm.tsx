@@ -162,16 +162,19 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                     label="City"
                     name="senderAddress.city"
                     type="text"
+                    errorBottom
                   />
                   <TextInput
                     label="Post Code"
                     name="senderAddress.postCode"
                     type="text"
+                    errorBottom
                   />
                   <TextInput
                     label="Country"
                     name="senderAddress.country"
                     type="text"
+                    errorBottom
                   />
                 </Stack>
               </Stack>
@@ -201,16 +204,19 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                     label="City"
                     name="clientAddress.city"
                     type="text"
+                    errorBottom
                   />
                   <TextInput
                     label="Post Code"
                     name="clientAddress.postCode"
                     type="text"
+                    errorBottom
                   />
                   <TextInput
                     label="Country"
                     name="clientAddress.country"
                     type="text"
+                    errorBottom
                   />
                 </Stack>
                 <Stack direction={'row'}>
@@ -219,6 +225,7 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                       label="Invoice Date"
                       name="createdAt"
                       type="date"
+                      errorBottom
                     />
                   </Box>
 
@@ -250,7 +257,7 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                               key={index}
                               templateColumns={{
                                 base: 'repeat(6, 1fr)',
-                                md: 'repeat(9, 1fr)'
+                                md: 'repeat(10, 1fr)'
                               }}
                               columnGap={2}
                               rowGap={4}
@@ -260,13 +267,15 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                                   label="Item Name"
                                   name={`items.${index}.name`}
                                   type="text"
+                                  errorBottom
                                 />
                               </GridItem>
-                              <GridItem>
+                              <GridItem colSpan={{ md: 2 }}>
                                 <TextInput
                                   label="Qty."
                                   name={`items.${index}.quantity`}
                                   type="number"
+                                  errorBottom
                                 />
                               </GridItem>
                               <GridItem colSpan={2}>
@@ -274,6 +283,7 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                                   label="Price"
                                   name={`items.${index}.price`}
                                   type="number"
+                                  errorBottom
                                 />
                               </GridItem>
                               <GridItem colSpan={2}>

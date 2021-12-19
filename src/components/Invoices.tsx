@@ -1,6 +1,6 @@
 import React from 'react'
 import { Stack, Image, Heading, Text } from '@chakra-ui/react'
-
+import { motion, AnimatePresence } from 'framer-motion'
 import { InvoiceItem } from './InvoiceItem'
 import empty from '/illustration-empty.svg'
 import { useInvoiceContext } from '../contextInvoice'
@@ -10,17 +10,19 @@ const Invoices = () => {
   return (
     <>
       {invoices.length > 0 ? (
-        <Stack spacing={5}>
-          {filters.length > 0
-            ? invoices
-                .filter((invoice) => filters.includes(invoice.status))
-                .map((invoice) => (
+        <AnimatePresence>
+          <Stack spacing={5}>
+            {filters.length > 0
+              ? invoices
+                  .filter((invoice) => filters.includes(invoice.status))
+                  .map((invoice) => (
+                    <InvoiceItem key={invoice.id} invoice={invoice} />
+                  ))
+              : invoices.map((invoice) => (
                   <InvoiceItem key={invoice.id} invoice={invoice} />
-                ))
-            : invoices.map((invoice) => (
-                <InvoiceItem key={invoice.id} invoice={invoice} />
-              ))}
-        </Stack>
+                ))}
+          </Stack>
+        </AnimatePresence>
       ) : (
         <Stack
           direction={'column'}

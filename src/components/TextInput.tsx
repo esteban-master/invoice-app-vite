@@ -15,10 +15,12 @@ export const TextInput = ({
   input,
   name,
   type,
-  value
+  value,
+  errorBottom
 }: {
   label: string
   type: string
+  errorBottom?: boolean
   input?: ({
     field
   }: {
@@ -42,9 +44,11 @@ export const TextInput = ({
                   {label}
                 </Text>
               </FormLabel>
-              <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
-                {meta.error}
-              </FormErrorMessage>
+              {!errorBottom && (
+                <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
+                  {meta.error}
+                </FormErrorMessage>
+              )}
             </Stack>
 
             {input ? (
@@ -58,6 +62,11 @@ export const TextInput = ({
                 disabled={label === 'Total'}
                 value={value}
               />
+            )}
+            {errorBottom && (
+              <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
+                {meta.error}
+              </FormErrorMessage>
             )}
           </FormControl>
         )
