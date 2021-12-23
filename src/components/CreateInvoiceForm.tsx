@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-import { FieldArray, Form, Formik } from 'formik'
-import * as Yup from 'yup'
 import { TextInput } from './TextInput'
 
 import addDays from 'date-fns/addDays'
@@ -26,374 +24,410 @@ import {
 } from '@chakra-ui/react'
 import { BsChevronDown } from 'react-icons/bs'
 import { AiFillDelete } from 'react-icons/ai'
-import { Item } from '../interfaces'
+import { Invoice, Item } from '../interfaces'
 import { formatDateEs } from '../utils/formatDateEs'
-import { Filters, useInvoiceContext } from '../contextInvoice'
+import { useInvoiceContext } from '../contextInvoice'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as Yup from 'yup'
+
+const schema = Yup.object({
+  clientName: Yup.string().required("can't be empty"),
+  createdAt: Yup.string().required("can't be empty"),
+  description: Yup.string().required("can't be empty"),
+  paymentTerms: Yup.number().required("can't be empty"),
+  clientEmail: Yup.string()
+    .required("can't be empty")
+    .email('Please enter a valid email'),
+  senderAddress: Yup.object({
+    street: Yup.string().required("can't be empty"),
+    city: Yup.string().required("can't be empty"),
+    postCode: Yup.string().required("can't be empty"),
+    country: Yup.string().required("can't be empty")
+  }),
+  clientAddress: Yup.object({
+    street: Yup.string().required("can't be empty"),
+    city: Yup.string().required("can't be empty"),
+    postCode: Yup.string().required("can't be empty"),
+    country: Yup.string().required("can't be empty")
+  }),
+  items: Yup.array()
+    .min(1)
+    .of(
+      Yup.object({
+        name: Yup.string().required("can't be empty"),
+        quantity: Yup.number()
+          .typeError('should be a number')
+          .min(1, 'minimum 1')
+          .required("can't be empty"),
+        price: Yup.number()
+          .typeError('should be a number')
+          .required("can't be empty"),
+        total: Yup.number().required("can't be empty")
+      })
+    )
+})
 
 const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
   const { colorMode } = useColorMode()
-  const [status, setStatus] = useState<Filters>('draft')
   const { invoices, addNewInvoice } = useInvoiceContext()
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    control,
+    setValue,
+    formState: { isValid, errors }
+  } = useForm<Invoice>({
+    mode: 'onBlur',
+    resolver: yupResolver(schema),
+    defaultValues: {
+      paymentTerms: 1,
+      items: [{ name: '', price: 100, quantity: 1, total: 0 }]
+    }
+  })
 
-  function handleSubmit(formik: any, status: 'draft' | 'pending') {
-    setStatus(status)
-    formik.submitForm()
+  const fieldArray = useFieldArray({
+    control,
+    name: 'items'
+  })
+
+  function submitForm(values: Invoice) {
+    const { total } = values.items.reduce<{
+      total: number
+    }>(
+      (acc, item) => {
+        acc.total += Number(item.total)
+        return acc
+      },
+      { total: 0 }
+    )
+    const paymentDue = formatDateEs(
+      addDays(new Date(values.createdAt), values.paymentTerms),
+      'yyyy-MM-dd'
+    )
+
+    addNewInvoice({
+      ...values,
+      total,
+      paymentDue,
+      id: `RANDOM${invoices.length}`
+    })
+    submit()
   }
 
   return (
-    <Formik
-      initialValues={{
-        clientName: '',
-        clientEmail: '',
-        createdAt: '',
-        paymentTerms: 1,
-        description: '',
-        senderAddress: {
-          street: '',
-          city: '',
-          postCode: '',
-          country: ''
-        },
-        clientAddress: {
-          street: '',
-          city: '',
-          postCode: '',
-          country: ''
-        },
-        items: [
-          {
-            name: '',
-            quantity: '',
-            price: '',
-            total: 0
-          }
-        ]
-      }}
-      validationSchema={Yup.object({
-        clientName: Yup.string().required("can't be empty"),
-        createdAt: Yup.string().required("can't be empty"),
-        description: Yup.string().required("can't be empty"),
-        paymentTerms: Yup.number().required("can't be empty"),
-        clientEmail: Yup.string()
-          .required("can't be empty")
-          .email('Ingresa un email valido'),
-        senderAddress: Yup.object({
-          street: Yup.string().required("can't be empty"),
-          city: Yup.string().required("can't be empty"),
-          postCode: Yup.string().required("can't be empty"),
-          country: Yup.string().required("can't be empty")
-        }),
-        clientAddress: Yup.object({
-          street: Yup.string().required("can't be empty"),
-          city: Yup.string().required("can't be empty"),
-          postCode: Yup.string().required("can't be empty"),
-          country: Yup.string().required("can't be empty")
-        }),
-        items: Yup.array()
-          .min(1)
-          .of(
-            Yup.object({
-              name: Yup.string().required("can't be empty"),
-              quantity: Yup.number().required("can't be empty"),
-              price: Yup.number().required("can't be empty"),
-              total: Yup.number().required("can't be empty")
-            })
-          )
-      })}
-      onSubmit={(values) => {
-        const { items, total } = values.items.reduce<{
-          total: number
-          items: Item[]
-        }>(
-          (acc, item) => {
-            let newItem: Item = {
-              ...item,
-              quantity: Number(item.quantity),
-              price: Number(item.price),
-              total: Number(Number(item.price) * Number(item.quantity))
-            }
-            acc.items.push(newItem)
-            acc.total += newItem.total
-            return acc
-          },
-          { total: 0, items: [] }
-        )
-        const paymentDue = formatDateEs(
-          addDays(new Date(values.createdAt), values.paymentTerms),
-          'yyyy-MM-dd'
-        )
-
-        addNewInvoice({
-          ...values,
-          items,
-          total,
-          status,
-          paymentDue,
-          id: `RANDOM${invoices.length}`
-        })
-        submit()
-      }}
-    >
-      {(formik) => (
-        <Form>
+    <div>
+      <form onSubmit={handleSubmit(submitForm)}>
+        <Stack spacing={10}>
           <Stack spacing={10}>
-            <Stack spacing={10}>
-              <Stack spacing={6}>
-                <Heading as="h2" fontSize={'xs'} color={'primary.500'}>
-                  Bill From
-                </Heading>
+            <Stack spacing={6}>
+              <Heading as="h2" fontSize={'xs'} color={'primary.500'}>
+                Bill From
+              </Heading>
+              <TextInput
+                label="Street Address"
+                name="senderAddress.street"
+                type="text"
+                register={register}
+                error={errors?.senderAddress?.street}
+                input={({ name, register, type, bg }) => (
+                  <Input
+                    fontWeight={'bold'}
+                    {...register(name)}
+                    bg={bg}
+                    type={type}
+                  />
+                )}
+              />
+
+              <Stack direction={'row'} spacing={5}>
                 <TextInput
-                  label="Street Address"
-                  name="senderAddress.street"
+                  label="City"
+                  name="senderAddress.city"
                   type="text"
-                  input={({ field: { field }, type, bg }) => (
-                    <Input
-                      fontWeight={'bold'}
-                      {...field}
-                      bg={bg}
-                      type={type}
-                      ref={firstField}
-                    />
-                  )}
+                  register={register}
+                  error={errors?.senderAddress?.city}
+                  errorBottom
                 />
-
-                <Stack direction={'row'} spacing={5}>
-                  <TextInput
-                    label="City"
-                    name="senderAddress.city"
-                    type="text"
-                    errorBottom
-                  />
-                  <TextInput
-                    label="Post Code"
-                    name="senderAddress.postCode"
-                    type="text"
-                    errorBottom
-                  />
-                  <TextInput
-                    label="Country"
-                    name="senderAddress.country"
-                    type="text"
-                    errorBottom
-                  />
-                </Stack>
-              </Stack>
-
-              <Stack spacing={6}>
-                <Heading as="h2" fontSize={'xs'} color={'primary.500'}>
-                  Bill From
-                </Heading>
                 <TextInput
-                  label="Client's Name"
-                  name="clientName"
+                  label="Post Code"
+                  name="senderAddress.postCode"
                   type="text"
+                  register={register}
+                  error={errors?.senderAddress?.postCode}
+                  errorBottom
                 />
                 <TextInput
-                  label="Client's Email"
-                  name="clientEmail"
-                  type="email"
-                />
-                <TextInput
-                  label="Street Address"
-                  name="clientAddress.street"
+                  label="Country"
+                  name="senderAddress.country"
                   type="text"
+                  register={register}
+                  error={errors?.senderAddress?.country}
+                  errorBottom
                 />
-
-                <Stack direction={'row'} spacing={5}>
-                  <TextInput
-                    label="City"
-                    name="clientAddress.city"
-                    type="text"
-                    errorBottom
-                  />
-                  <TextInput
-                    label="Post Code"
-                    name="clientAddress.postCode"
-                    type="text"
-                    errorBottom
-                  />
-                  <TextInput
-                    label="Country"
-                    name="clientAddress.country"
-                    type="text"
-                    errorBottom
-                  />
-                </Stack>
-                <Stack direction={'row'}>
-                  <Box width={'50%'}>
-                    <TextInput
-                      label="Invoice Date"
-                      name="createdAt"
-                      type="date"
-                      errorBottom
-                    />
-                  </Box>
-
-                  <Box width={'50%'}>
-                    <SelectPaymentTerms
-                      items={items}
-                      formik={formik}
-                      label={'Payment Terms'}
-                      value={formik.getFieldMeta('paymentTerms').value}
-                    />
-                  </Box>
-                </Stack>
-                <TextInput
-                  label="Project Description"
-                  name="description"
-                  type="text"
-                />
-                <Stack spacing={8}>
-                  <Heading fontSize={'lg'} color={'#777F98'}>
-                    Item List
-                  </Heading>
-
-                  <FieldArray name="items">
-                    {({ insert, remove, push }) => (
-                      <Stack spacing={8}>
-                        {formik.values.items.length > 0 &&
-                          formik.values.items.map((item, index) => (
-                            <Grid
-                              key={index}
-                              templateColumns={{
-                                base: 'repeat(6, 1fr)',
-                                md: 'repeat(10, 1fr)'
-                              }}
-                              columnGap={2}
-                              rowGap={4}
-                            >
-                              <GridItem colSpan={{ base: 6, md: 3 }}>
-                                <TextInput
-                                  label="Item Name"
-                                  name={`items.${index}.name`}
-                                  type="text"
-                                  errorBottom
-                                />
-                              </GridItem>
-                              <GridItem colSpan={{ md: 2 }}>
-                                <TextInput
-                                  label="Qty."
-                                  name={`items.${index}.quantity`}
-                                  type="number"
-                                  errorBottom
-                                />
-                              </GridItem>
-                              <GridItem colSpan={2}>
-                                <TextInput
-                                  label="Price"
-                                  name={`items.${index}.price`}
-                                  type="number"
-                                  errorBottom
-                                />
-                              </GridItem>
-                              <GridItem colSpan={2}>
-                                <TextInput
-                                  label="Total"
-                                  name={`items.${index}.total`}
-                                  type="number"
-                                  value={
-                                    formik.getFieldProps(`items.${index}.price`)
-                                      .value *
-                                    formik.getFieldProps(
-                                      `items.${index}.quantity`
-                                    ).value
-                                  }
-                                />
-                              </GridItem>
-                              <GridItem
-                                alignSelf={'end'}
-                                justifySelf={'center'}
-                              >
-                                <Icon
-                                  _hover={{
-                                    color: 'red_custom.500'
-                                  }}
-                                  cursor={'pointer'}
-                                  width={7}
-                                  height={7}
-                                  as={AiFillDelete}
-                                  onClick={() => remove(index)}
-                                />
-                              </GridItem>
-                            </Grid>
-                          ))}
-
-                        <Button
-                          borderRadius={'3xl'}
-                          leftIcon={<FaPlus />}
-                          paddingY={5}
-                          color={
-                            colorMode === 'dark' ? 'texto.dark' : 'texto.light'
-                          }
-                          bg={colorMode === 'dark' ? 'bg_app.gray' : '#F9FAFE'}
-                          fontSize={'xs'}
-                          fontWeight={'bold'}
-                          onClick={() =>
-                            push({
-                              name: '',
-                              quantity: 0,
-                              price: 0,
-                              total: 0
-                            })
-                          }
-                        >
-                          Add New Item
-                        </Button>
-                      </Stack>
-                    )}
-                  </FieldArray>
-                </Stack>
               </Stack>
             </Stack>
-            <Stack direction={'row'} justifyContent={'space-between'}>
+
+            <Stack spacing={6}>
+              <Heading as="h2" fontSize={'xs'} color={'primary.500'}>
+                Bill From
+              </Heading>
+              <TextInput
+                label="Client's Name"
+                name="clientName"
+                type="text"
+                register={register}
+                error={errors?.clientName}
+              />
+              <TextInput
+                label="Client's Email"
+                name="clientEmail"
+                type="email"
+                register={register}
+                error={errors?.clientEmail}
+              />
+              <TextInput
+                label="Street Address"
+                name="clientAddress.street"
+                type="text"
+                register={register}
+                error={errors?.clientAddress?.street}
+              />
+
+              <Stack direction={'row'} spacing={5}>
+                <TextInput
+                  label="City"
+                  name="clientAddress.city"
+                  type="text"
+                  register={register}
+                  error={errors?.clientAddress?.city}
+                  errorBottom
+                />
+                <TextInput
+                  label="Post Code"
+                  name="clientAddress.postCode"
+                  type="text"
+                  register={register}
+                  error={errors?.clientAddress?.postCode}
+                  errorBottom
+                />
+                <TextInput
+                  label="Country"
+                  name="clientAddress.country"
+                  type="text"
+                  register={register}
+                  error={errors?.clientAddress?.country}
+                  errorBottom
+                />
+              </Stack>
+              <Stack direction={'row'}>
+                <Box width={'50%'}>
+                  <TextInput
+                    label="Invoice Date"
+                    name="createdAt"
+                    type="date"
+                    register={register}
+                    error={errors?.createdAt}
+                    errorBottom
+                  />
+                </Box>
+
+                <Box width={'50%'}>
+                  <SelectPaymentTerms
+                    items={items}
+                    label={'Payment Terms'}
+                    control={control}
+                    setValue={(value: number) =>
+                      setValue('paymentTerms', value)
+                    }
+                  />
+                </Box>
+              </Stack>
+              <TextInput
+                label="Project Description"
+                name="description"
+                register={register}
+                error={errors?.description}
+                type="text"
+              />
+              <Stack spacing={8}>
+                <Heading fontSize={'lg'} color={'#777F98'}>
+                  Item List
+                </Heading>
+
+                {fieldArray.fields.map((field, index) => (
+                  <Stack key={field.id} spacing={8}>
+                    <Grid
+                      key={index}
+                      templateColumns={{
+                        base: 'repeat(6, 1fr)',
+                        md: 'repeat(10, 1fr)'
+                      }}
+                      columnGap={2}
+                      rowGap={4}
+                    >
+                      <GridItem colSpan={{ base: 6, md: 3 }}>
+                        <TextInput
+                          label="Item Name"
+                          name={`items.${index}.name`}
+                          type="text"
+                          register={register}
+                          error={
+                            errors.items
+                              ? errors?.items[index]?.name
+                              : undefined
+                          }
+                          errorBottom
+                        />
+                      </GridItem>
+                      <GridItem colSpan={{ md: 2 }}>
+                        <TextInput
+                          label="Qty."
+                          name={`items.${index}.quantity`}
+                          type="number"
+                          register={register}
+                          error={
+                            errors.items
+                              ? errors?.items[index]?.quantity
+                              : undefined
+                          }
+                          errorBottom
+                        />
+                      </GridItem>
+                      <GridItem colSpan={2}>
+                        <TextInput
+                          label="Price"
+                          name={`items.${index}.price`}
+                          type="number"
+                          register={register}
+                          error={
+                            errors.items
+                              ? errors?.items[index]?.price
+                              : undefined
+                          }
+                          errorBottom
+                        />
+                      </GridItem>
+                      <GridItem colSpan={2}>
+                        <TextInput
+                          label="Total"
+                          name={`items.${index}.total`}
+                          type="number"
+                          register={register}
+                          error={undefined}
+                          input={({ name, register, bg: bgColor, type }) => {
+                            const watch = useWatch({
+                              control,
+                              name: `items.${index}`
+                            })
+                            React.useEffect(() => {
+                              setValue(
+                                `items.${index}.total`,
+                                Number(
+                                  Number(watch.price) * Number(watch.quantity)
+                                )
+                              )
+                            }, [watch.price, watch.quantity])
+                            return (
+                              <Input
+                                fontWeight={'bold'}
+                                type={type}
+                                bg={bgColor}
+                                {...register(name)}
+                                disabled
+                              />
+                            )
+                          }}
+                        />
+                      </GridItem>
+                      <GridItem alignSelf={'end'} justifySelf={'center'}>
+                        <Icon
+                          _hover={{
+                            color: 'red_custom.500'
+                          }}
+                          cursor={'pointer'}
+                          width={7}
+                          height={7}
+                          as={AiFillDelete}
+                          onClick={() => fieldArray.remove(index)}
+                        />
+                      </GridItem>
+                    </Grid>
+                  </Stack>
+                ))}
+                <Button
+                  borderRadius={'3xl'}
+                  leftIcon={<FaPlus />}
+                  paddingY={5}
+                  color={colorMode === 'dark' ? 'texto.dark' : 'texto.light'}
+                  bg={colorMode === 'dark' ? 'bg_app.gray' : '#F9FAFE'}
+                  fontSize={'xs'}
+                  fontWeight={'bold'}
+                  onClick={() =>
+                    fieldArray.append({
+                      name: '',
+                      quantity: 0,
+                      price: 0,
+                      total: 0
+                    })
+                  }
+                >
+                  Add New Item
+                </Button>
+              </Stack>
+            </Stack>
+          </Stack>
+          <Stack direction={'row'} justifyContent={'space-between'}>
+            <Button
+              onClick={discard}
+              _hover={{
+                bg: colorMode === 'dark' ? 'white' : 'texto.dark',
+                color: 'texto.light'
+              }}
+              bg={colorMode === 'dark' ? 'bg_app.gray' : '#F9FAFE'}
+              borderRadius={'3xl'}
+              padding={5}
+              fontSize={'xs'}
+              color={colorMode === 'dark' ? 'texto.dark' : 'texto.light'}
+            >
+              Discard
+            </Button>
+            <Stack direction={'row'}>
               <Button
-                onClick={discard}
+                onClick={() => setValue('status', 'draft')}
+                type="submit"
                 _hover={{
-                  bg: colorMode === 'dark' ? 'white' : 'texto.dark',
-                  color: 'texto.light'
+                  bg: colorMode === 'dark' ? 'bg_app.gray' : 'texto.dark',
+                  color: 'white'
                 }}
-                bg={colorMode === 'dark' ? 'bg_app.gray' : '#F9FAFE'}
+                bg={colorMode === 'dark' ? 'draft.500' : 'draft.500'}
                 borderRadius={'3xl'}
                 padding={5}
                 fontSize={'xs'}
                 color={colorMode === 'dark' ? 'texto.dark' : 'texto.light'}
               >
-                Discard
+                Save as Draf
               </Button>
-              <Stack direction={'row'}>
-                <Button
-                  onClick={() => handleSubmit(formik, 'draft')}
-                  _hover={{
-                    bg: colorMode === 'dark' ? 'bg_app.gray' : 'texto.dark',
-                    color: 'white'
-                  }}
-                  bg={colorMode === 'dark' ? 'draft.500' : 'draft.500'}
-                  borderRadius={'3xl'}
-                  padding={5}
-                  fontSize={'xs'}
-                  color={colorMode === 'dark' ? 'texto.dark' : 'texto.light'}
-                >
-                  Save as Draf
-                </Button>
-                <Button
-                  onClick={() => handleSubmit(formik, 'pending')}
-                  _hover={{
-                    bg: 'primary.100'
-                  }}
-                  fontSize={'xs'}
-                  bg={'primary.500'}
-                  borderRadius={'3xl'}
-                  padding={5}
-                  color={'white'}
-                >
-                  Save & Send
-                </Button>
-              </Stack>
+              <Button
+                type="submit"
+                onClick={() => setValue('status', 'pending')}
+                _hover={{
+                  bg: 'primary.100'
+                }}
+                fontSize={'xs'}
+                bg={'primary.500'}
+                borderRadius={'3xl'}
+                padding={5}
+                color={'white'}
+              >
+                Save & Send
+              </Button>
             </Stack>
           </Stack>
-        </Form>
-      )}
-    </Formik>
+        </Stack>
+      </form>
+    </div>
   )
 }
 
@@ -406,8 +440,13 @@ const items = [
   { label: 'Next 30 Days', value: 30 }
 ]
 
-const SelectPaymentTerms = ({ items, value, formik, label }: any) => {
+const SelectPaymentTerms = ({ items, control, setValue, label }: any) => {
   const { colorMode } = useColorMode()
+  const valuepaymentTerms = useWatch({
+    control,
+    name: 'paymentTerms'
+  })
+
   return (
     <FormControl>
       <FormLabel>
@@ -423,7 +462,7 @@ const SelectPaymentTerms = ({ items, value, formik, label }: any) => {
           as={Button}
           rightIcon={<BsChevronDown />}
         >
-          {items.find((item: any) => item.value === value).label ||
+          {items.find((item: any) => item.value === valuepaymentTerms).label ||
             items[0].label}
         </MenuButton>
         <MenuList width={'100%'}>
@@ -432,7 +471,7 @@ const SelectPaymentTerms = ({ items, value, formik, label }: any) => {
               key={item.label}
               width={'100%'}
               onClick={() => {
-                formik.setFieldValue('paymentTerms', item.value)
+                setValue(item.value)
               }}
             >
               {item.label}

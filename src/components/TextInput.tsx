@@ -1,5 +1,4 @@
 import React from 'react'
-import { Field, FieldProps } from 'formik'
 import {
   FormControl,
   FormErrorMessage,
@@ -9,68 +8,62 @@ import {
   Text,
   useColorMode
 } from '@chakra-ui/react'
+import { FieldError, UseFormRegister } from 'react-hook-form'
+import { Invoice } from '../interfaces'
 
 export const TextInput = ({
   label,
   input,
   name,
   type,
-  value,
-  errorBottom
+  register,
+  errorBottom,
+  error
 }: {
   label: string
   type: string
   errorBottom?: boolean
-  input?: ({
-    field
-  }: {
-    field: Partial<FieldProps>
+  input?: (props: {
+    name: any
+    register: UseFormRegister<Invoice>
     bg: string
     type: string
   }) => void
-  name: string
-  value?: number | string
+  name: any
+  register: UseFormRegister<Invoice>
+  error: FieldError | undefined
 }) => {
   const { colorMode } = useColorMode()
   const bgColor = colorMode === 'dark' ? 'bg_app.card' : 'white'
-  return (
-    <Field name={name}>
-      {({ field, meta }: FieldProps) => {
-        return (
-          <FormControl isInvalid={!!meta.error && meta.touched}>
-            <Stack direction={'row'} justifyContent={'space-between'}>
-              <FormLabel>
-                <Text color={meta.error && meta.touched ? '#EC5757' : ''}>
-                  {label}
-                </Text>
-              </FormLabel>
-              {!errorBottom && (
-                <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
-                  {meta.error}
-                </FormErrorMessage>
-              )}
-            </Stack>
 
-            {input ? (
-              <>{input({ field: { field }, bg: bgColor, type })}</>
-            ) : (
-              <Input
-                fontWeight={'bold'}
-                type={type}
-                bg={bgColor}
-                {...field}
-                disabled={label === 'Total'}
-                value={value}
-              />
-            )}
-            {errorBottom && (
-              <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
-                {meta.error}
-              </FormErrorMessage>
-            )}
-          </FormControl>
-        )
-      }}
-    </Field>
+  return (
+    <FormControl isInvalid={!!error}>
+      <Stack direction={'row'} justifyContent={'space-between'}>
+        <FormLabel>
+          <Text color={!!error ? '#EC5757' : ''}>{label}</Text>
+        </FormLabel>
+        {!errorBottom && (
+          <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
+            {error && <>{error.message}</>}
+          </FormErrorMessage>
+        )}
+      </Stack>
+
+      {input ? (
+        <>{input({ name, register, bg: bgColor, type })}</>
+      ) : (
+        <Input
+          fontWeight={'bold'}
+          type={type}
+          bg={bgColor}
+          {...register(name)}
+        />
+      )}
+      {errorBottom && (
+        <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
+          {error && <>{error.message}</>}
+        </FormErrorMessage>
+      )}
+    </FormControl>
   )
 }
