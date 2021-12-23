@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 import { TextInput } from './TextInput'
-
 import addDays from 'date-fns/addDays'
-
 import { FaPlus } from 'react-icons/fa'
 import {
   Heading,
@@ -24,10 +22,11 @@ import {
 } from '@chakra-ui/react'
 import { BsChevronDown } from 'react-icons/bs'
 import { AiFillDelete } from 'react-icons/ai'
-import { Invoice, Item } from '../interfaces'
+import { Invoice } from '../interfaces'
 import { formatDateEs } from '../utils/formatDateEs'
 import { useInvoiceContext } from '../contextInvoice'
 import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
@@ -130,7 +129,8 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                 name="senderAddress.street"
                 type="text"
                 register={register}
-                error={errors?.senderAddress?.street}
+                errors={errors}
+                isInvalid={errors.senderAddress?.street}
                 input={({ name, register, type, bg }) => (
                   <Input
                     fontWeight={'bold'}
@@ -147,15 +147,18 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                   name="senderAddress.city"
                   type="text"
                   register={register}
-                  error={errors?.senderAddress?.city}
+                  errors={errors}
+                  isInvalid={errors.senderAddress?.city}
                   errorBottom
                 />
+
                 <TextInput
                   label="Post Code"
                   name="senderAddress.postCode"
                   type="text"
                   register={register}
-                  error={errors?.senderAddress?.postCode}
+                  errors={errors}
+                  isInvalid={errors.senderAddress?.postCode}
                   errorBottom
                 />
                 <TextInput
@@ -163,7 +166,8 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                   name="senderAddress.country"
                   type="text"
                   register={register}
-                  error={errors?.senderAddress?.country}
+                  isInvalid={errors.senderAddress?.country}
+                  errors={errors}
                   errorBottom
                 />
               </Stack>
@@ -173,26 +177,30 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
               <Heading as="h2" fontSize={'xs'} color={'primary.500'}>
                 Bill From
               </Heading>
+
               <TextInput
                 label="Client's Name"
                 name="clientName"
                 type="text"
                 register={register}
-                error={errors?.clientName}
+                isInvalid={errors.clientName}
+                errors={errors}
               />
               <TextInput
                 label="Client's Email"
                 name="clientEmail"
                 type="email"
                 register={register}
-                error={errors?.clientEmail}
+                isInvalid={errors.clientEmail}
+                errors={errors}
               />
               <TextInput
                 label="Street Address"
                 name="clientAddress.street"
                 type="text"
                 register={register}
-                error={errors?.clientAddress?.street}
+                errors={errors}
+                isInvalid={errors.clientAddress?.street}
               />
 
               <Stack direction={'row'} spacing={5}>
@@ -201,7 +209,8 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                   name="clientAddress.city"
                   type="text"
                   register={register}
-                  error={errors?.clientAddress?.city}
+                  errors={errors}
+                  isInvalid={errors.clientAddress?.city}
                   errorBottom
                 />
                 <TextInput
@@ -209,7 +218,8 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                   name="clientAddress.postCode"
                   type="text"
                   register={register}
-                  error={errors?.clientAddress?.postCode}
+                  errors={errors}
+                  isInvalid={errors.clientAddress?.postCode}
                   errorBottom
                 />
                 <TextInput
@@ -217,7 +227,8 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                   name="clientAddress.country"
                   type="text"
                   register={register}
-                  error={errors?.clientAddress?.country}
+                  errors={errors}
+                  isInvalid={errors.clientAddress?.country}
                   errorBottom
                 />
               </Stack>
@@ -228,27 +239,29 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                     name="createdAt"
                     type="date"
                     register={register}
-                    error={errors?.createdAt}
+                    errors={errors}
+                    isInvalid={errors.createdAt}
                     errorBottom
                   />
                 </Box>
 
                 <Box width={'50%'}>
-                  <SelectPaymentTerms
+                  {/* <SelectPaymentTerms
                     items={items}
                     label={'Payment Terms'}
                     control={control}
                     setValue={(value: number) =>
                       setValue('paymentTerms', value)
                     }
-                  />
+                  /> */}
                 </Box>
               </Stack>
               <TextInput
                 label="Project Description"
                 name="description"
                 register={register}
-                error={errors?.description}
+                errors={errors}
+                isInvalid={errors.description}
                 type="text"
               />
               <Stack spacing={8}>
@@ -273,10 +286,9 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                           name={`items.${index}.name`}
                           type="text"
                           register={register}
-                          error={
-                            errors.items
-                              ? errors?.items[index]?.name
-                              : undefined
+                          errors={errors}
+                          isInvalid={
+                            errors.items ? errors?.items[index].name : undefined
                           }
                           errorBottom
                         />
@@ -287,9 +299,10 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                           name={`items.${index}.quantity`}
                           type="number"
                           register={register}
-                          error={
+                          errors={errors}
+                          isInvalid={
                             errors.items
-                              ? errors?.items[index]?.quantity
+                              ? errors?.items[index].quantity
                               : undefined
                           }
                           errorBottom
@@ -301,9 +314,10 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                           name={`items.${index}.price`}
                           type="number"
                           register={register}
-                          error={
+                          errors={errors}
+                          isInvalid={
                             errors.items
-                              ? errors?.items[index]?.price
+                              ? errors?.items[index].price
                               : undefined
                           }
                           errorBottom
@@ -315,7 +329,12 @@ const CreateInvoiceForm = ({ firstField, submit, discard }: any) => {
                           name={`items.${index}.total`}
                           type="number"
                           register={register}
-                          error={undefined}
+                          errors={errors}
+                          isInvalid={
+                            errors.items
+                              ? errors?.items[index].total
+                              : undefined
+                          }
                           input={({ name, register, bg: bgColor, type }) => {
                             const watch = useWatch({
                               control,

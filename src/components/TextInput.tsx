@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { LegacyRef, useRef } from 'react'
 import {
   FormControl,
   FormErrorMessage,
@@ -8,8 +8,14 @@ import {
   Text,
   useColorMode
 } from '@chakra-ui/react'
-import { FieldError, UseFormRegister } from 'react-hook-form'
+import {
+  FieldError,
+  FieldErrors,
+  UseFormRegister,
+  useFormState
+} from 'react-hook-form'
 import { Invoice } from '../interfaces'
+import { ErrorMessage as ErrorMessageHookForm } from '@hookform/error-message'
 
 export const TextInput = ({
   label,
@@ -18,7 +24,8 @@ export const TextInput = ({
   type,
   register,
   errorBottom,
-  error
+  errors,
+  isInvalid
 }: {
   label: string
   type: string
@@ -31,24 +38,30 @@ export const TextInput = ({
   }) => void
   name: any
   register: UseFormRegister<Invoice>
-  error: FieldError | undefined
+  errors: FieldErrors<Invoice>
+  isInvalid: FieldError | undefined
 }) => {
   const { colorMode } = useColorMode()
   const bgColor = colorMode === 'dark' ? 'bg_app.card' : 'white'
 
   return (
-    <FormControl isInvalid={!!error}>
+    <FormControl isInvalid={!!isInvalid}>
       <Stack direction={'row'} justifyContent={'space-between'}>
         <FormLabel>
-          <Text color={!!error ? '#EC5757' : ''}>{label}</Text>
+          <Text
+          // color={true ? '#EC5757' : ''}
+          >
+            {label}
+          </Text>
         </FormLabel>
         {!errorBottom && (
           <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
-            {error && <>{error.message}</>}
+            <ErrorMessageHookForm errors={errors} name={name} />
           </FormErrorMessage>
         )}
       </Stack>
 
+      {/* {<ErrorMessageHookForm errors={errors} name={name} /> ? 'poto' : 'teta'} */}
       {input ? (
         <>{input({ name, register, bg: bgColor, type })}</>
       ) : (
@@ -61,7 +74,7 @@ export const TextInput = ({
       )}
       {errorBottom && (
         <FormErrorMessage fontSize={'xs'} color={'#EC5757'}>
-          {error && <>{error.message}</>}
+          <ErrorMessageHookForm errors={errors} name={name} />
         </FormErrorMessage>
       )}
     </FormControl>
